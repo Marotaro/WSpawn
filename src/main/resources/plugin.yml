@@ -1,0 +1,8 @@
+name: ExamplePlugin
+version: '0.0.0-SNAPSHOT'
+main: ch.wondercraft.wspawn.SpawnPlugin
+description: An example plugin
+author: LoanM
+website: https://wondercraft.ch
+api-version: '1.21.11'
+permissions:

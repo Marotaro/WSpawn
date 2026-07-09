@@ -1,0 +1,5 @@
+name: WSpawn
+version: '0.0.0-SNAPSHOT'
+main: ch.wondercraft.wspawn.SpawnPlugin
+description: An example plugin
+api-version: '1.21.11'
