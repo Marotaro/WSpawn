@@ -1,16 +1,21 @@
-package ch.wondercraft.wspawn;
+package ch.wondercraft.wonderspawn;
 
+import ch.wondercraft.wonderspawn.commands.spawn;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class SpawnPlugin extends JavaPlugin implements Listener {
+import java.util.Objects;
+
+public class WonderSpawn extends JavaPlugin implements Listener, CommandExecutor {
      @Override
      public void onEnable(){
          Bukkit.getPluginManager().registerEvents(this, this);
+         Objects.requireNonNull(getCommand("spawn")).setExecutor(new spawn());
      }
 
      @EventHandler

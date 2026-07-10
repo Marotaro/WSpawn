@@ -1,1 +1,1 @@
-rootProject.name = "WSpawn"
+rootProject.name = "WonderSpawn"
