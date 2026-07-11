@@ -14,10 +14,10 @@ repositories {
 
 dependencies {
     dependencies {
-        compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+        compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
     }
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }

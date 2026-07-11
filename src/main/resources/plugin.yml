@@ -4,5 +4,8 @@ main: ch.wondercraft.wonderspawn.WonderSpawn
 description: An example plugin
 author: LoanM
 website: https://wondercraft.ch
-api-version: '1.21.11'
-
+api-version: '26.1.2'
+permissions:
+  wonderspawn.spawn:
+    description: "Autorise l'utilisation du spawn"
+    default: true
