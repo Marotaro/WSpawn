@@ -5,8 +5,17 @@ description: An example plugin
 api-version: '26.1.2'
 permissions:
   wonderspawn.spawn:
-    description: "Autorise l'utilisation du spawn"
+    description: "Autorise l'utilisation du /spawn"
     default: true
   wonderspawn.setspawn:
-    description: "Autorise l'utilisation du setspawn"
-    default: true
+    description: "Autorise l'utilisation du /setspawn"
+    default: op
+  wonderspawn.setspawn.here:
+    description: "autorise l'utilisation du /setspawn here"
+    default: op
+  wonderspawn.setspawn.coords:
+    description: "autorise l'utilisation du /setspawn coords"
+    default: op
+  wonderspawn.setspawn.full:
+    description: "autorise l'utilisation du /setspawn full"
+    default: op
