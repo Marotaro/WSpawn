@@ -7,3 +7,6 @@ permissions:
   wonderspawn.spawn:
     description: "Autorise l'utilisation du spawn"
     default: true
+  wonderspawn.setspawn:
+    description: "Autorise l'utilisation du setspawn"
+    default: true

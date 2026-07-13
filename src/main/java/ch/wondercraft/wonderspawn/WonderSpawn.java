@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn;
 
+import ch.wondercraft.wonderspawn.commands.Set;
 import ch.wondercraft.wonderspawn.commands.Spawn;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -21,6 +22,7 @@ public class WonderSpawn extends JavaPlugin implements Listener {
          this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
              final Commands commands = event.registrar();
              commands.register(Spawn.create(getConfig()), "Se téléporter au spawn");
+             commands.register(Set.create(getConfig()),"Définire le spawn");
          });
      }
 
