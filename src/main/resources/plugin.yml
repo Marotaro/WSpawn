@@ -1,6 +1,6 @@
-name: WonderSpawn
+name: WSpawn
 version: '0.0.0-SNAPSHOT'
-main: ch.wondercraft.wonderspawn.WonderSpawn
+main: ch.wondercraft.wonderspawn.WSpawn
 description: An example plugin
 author: LoanM
 website: https://wondercraft.ch
