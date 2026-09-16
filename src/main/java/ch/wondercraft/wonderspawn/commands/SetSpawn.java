@@ -8,7 +8,9 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
+import io.papermc.paper.command.brigadier.argument.resolvers.RotationResolver;
 import io.papermc.paper.math.FinePosition;
+import io.papermc.paper.math.Rotation;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -27,7 +29,6 @@ public class SetSpawn {
                         return Command.SINGLE_SUCCESS;
                     }
                     locationFiler.setSpawnPoint(executor.getLocation());
-                    locationFiler.save();
                     //todo change to custom message with message file
                     sender.sendMessage("spawn correctly set at "+ executor.getLocation().getDirection().toString()+" in "+executor.getLocation().getWorld().getName());
                     return Command.SINGLE_SUCCESS;
@@ -42,8 +43,12 @@ public class SetSpawn {
                                             World world = context.getArgument("worldName", World.class);
                                             FinePositionResolver finePositionResolver = context.getArgument("position", FinePositionResolver.class);
                                             FinePosition finePosition = finePositionResolver.resolve(source);
-
-                                            Location location = new Location()
+                                            Location location = finePosition.toLocation(world);
+                                            RotationResolver rotationResolver = context.getArgument("rotation", RotationResolver.class);
+                                            location.setRotation(rotationResolver.resolve(source));
+                                            locationFiler.setSpawnPoint(location);
+                                            //todo change to custom message with message file
+                                            sender.sendMessage("spawn correctly set at "+ executor.getLocation().getDirection().toString()+" in "+executor.getLocation().getWorld().getName());
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 )

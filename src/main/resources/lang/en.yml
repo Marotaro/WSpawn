@@ -1,0 +1,16 @@
+##global variables:
+# spawn.x - x coordonate of the spawn
+# spawn.y - y coordonate of the spawn
+# spawn.z - z coodonate of the spawn
+# spawn.world - name of the world
+
+prefix: "[WSpawn]"
+spawn:
+  self: "<prefix> You have been teleported to the spawn"
+  other:
+    # target is the teleported player
+    commander:
+      single: "You teleported <target> to the spawn"
+      all: "You teleported <number> players to the spawn"
+    # commander might be a player or the console
+    target: "You have been teleported by <commander>"
