@@ -1,16 +1,21 @@
 ##global variables:
-# spawn.x - x coordonate of the spawn
-# spawn.y - y coordonate of the spawn
-# spawn.z - z coodonate of the spawn
-# spawn.world - name of the world
+# spawn_x - x coordonate of the spawn
+# spawn_y - y coordonate of the spawn
+# spawn_z - z coodonate of the spawn
+# spawn_world - name of the world
 
-prefix: "[WSpawn]"
+prefix: "<gray>[<aqua>WSpawn<gray>]"
 spawn:
-  self: "<prefix> You have been teleported to the spawn"
+  self: "<green>You have been teleported to the spawn <gray>(<white><spawn_x><gray>, <white><spawn_y><gray>, <white><spawn_z><gray>)"
   other:
     # target is the teleported player
     commander:
-      single: "You teleported <target> to the spawn"
-      all: "You teleported <number> players to the spawn"
+      single: "<green>You teleported <yellow><target> <green>to the spawn"
+      all: "<green>You teleported <yellow><number> <green>players to the spawn"
     # commander might be a player or the console
-    target: "You have been teleported by <commander>"
+    target: "<green>You have been teleported by <yellow><commander>"
+  errors:
+    teleportation: "<red>There has been an errorTeleportation while teleporting"
+    executor:
+      null: "You cannot use spawn commands without an executor"
+      not_a_player: "Executor needs to be a player"

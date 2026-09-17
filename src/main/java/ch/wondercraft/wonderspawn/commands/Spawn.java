@@ -1,6 +1,8 @@
 package ch.wondercraft.wonderspawn.commands;
 
 import ch.wondercraft.wonderspawn.LocationFiler;
+import ch.wondercraft.wonderspawn.message.Messages;
+import ch.wondercraft.wonderspawn.message.MessagesHandler;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -12,37 +14,42 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class Spawn {
-    public static LiteralArgumentBuilder<CommandSourceStack> create(LocationFiler locationFiler){
+    public static LiteralArgumentBuilder<CommandSourceStack> create(LocationFiler locationFiler, MessagesHandler messagesHandler){
         return Commands.literal("spawn").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.spawn")).executes(
                 commandContext -> {
                     CommandSourceStack source = commandContext.getSource();
                     CommandSender sender = source.getSender();
                     Entity executor = source.getExecutor();
                     if (executor == null){
-                        //todo change to custom message with message file
-                        sender.sendMessage("cannot use spawn without an executor");
+                        sender.sendMessage(Messages.errorExecutorNull(messagesHandler));
                         return Command.SINGLE_SUCCESS;
                     }
                     if (!(executor instanceof Player)){
-                        //todo change to custom message with message file
-                        sender.sendMessage("executor needs to be a player");
+                        sender.sendMessage(Messages.errorExecutorNotAPlayer(messagesHandler));
                         return Command.SINGLE_SUCCESS;
                     }
                     if (sender instanceof Player player){
                         if (player.getUniqueId().equals(executor.getUniqueId())){
-                            //todo change to custom message with message file
-                            player.sendMessage("you teleported to spawn");
-                            player.teleport(locationFiler.getSpawnPoint());
+                            player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept( b -> {
+                                player.sendMessage((b)?Messages.self(messagesHandler): Messages.errorTeleportation(messagesHandler));
+                            });
                         } else {
-                            //todo change to custom message with message file
-                            player.sendMessage("you teleported "+executor.getName()+" to spawn");
-                            executor.sendMessage("you have been teleported to spawn by "+player.getName());
-                            executor.teleport(locationFiler.getSpawnPoint());
+                            executor.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
+                                if (b){
+                                    player.sendMessage(Messages.otherCommanderSingle(messagesHandler,(Player) executor));
+                                    executor.sendMessage(Messages.otherTargetByPlayer(messagesHandler,player));
+                                } else
+                                    player.sendMessage(Messages.errorTeleportation(messagesHandler));
+                            });
                         }
                     } else {
-                        sender.sendMessage("you teleported "+executor.getName()+" to spawn");
-                        executor.sendMessage("you have been teleported to spawn by console");
-                        executor.teleport(locationFiler.getSpawnPoint());
+                        executor.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
+                            if (b){
+                                sender.sendMessage(Messages.otherCommanderSingle(messagesHandler,(Player) executor));
+                                executor.sendMessage(Messages.otherTargetByConsole(messagesHandler));
+                            } else
+                                sender.sendMessage(Messages.errorTeleportation(messagesHandler));
+                        });
                     }
                     return Command.SINGLE_SUCCESS;
                 }
@@ -54,19 +61,27 @@ public class Spawn {
                     Player target = targetResolver.resolve(source).getFirst();
                     if (sender instanceof Player player){
                         if (player.getUniqueId().equals(target.getUniqueId())){
-                            //todo change to custom message with message file
-                            player.sendMessage("you teleported to spawn");
-                            player.teleport(locationFiler.getSpawnPoint());
+                            player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
+                                player.sendMessage((b)?Messages.self(messagesHandler):Messages.errorTeleportation(messagesHandler));
+                            });
                         } else {
-                            //todo change to custom message with message file
-                            player.sendMessage("you teleported "+target.getName()+" to spawn");
-                            target.sendMessage("you have been teleported to spawn by "+player.getName());
-                            target.teleport(locationFiler.getSpawnPoint());
+                            target.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
+                                if (b){
+                                    player.sendMessage(Messages.otherCommanderSingle(messagesHandler,target));
+                                    target.sendMessage(Messages.otherTargetByPlayer(messagesHandler,player));
+                                } else
+                                    player.sendMessage(Messages.errorTeleportation(messagesHandler));
+                            });
                         }
                     } else {
-                        sender.sendMessage("you teleported "+target.getName()+" to spawn");
-                        target.sendMessage("you have been teleported to spawn by console");
-                        target.teleport(locationFiler.getSpawnPoint());
+
+                        target.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
+                            if (b){
+                                sender.sendMessage(Messages.otherCommanderSingle(messagesHandler,target));
+                                target.sendMessage(Messages.otherTargetByConsole(messagesHandler));
+                            } else
+                                sender.sendMessage(Messages.errorTeleportation(messagesHandler));
+                        });
                     }
                     return Command.SINGLE_SUCCESS;
                 }
@@ -76,11 +91,13 @@ public class Spawn {
                         context -> {
                             CommandSourceStack source = context.getSource();
                             CommandSender sender = source.getSender();
-                            sender.getServer().getOnlinePlayers().forEach(player -> {
-                                player.sendMessage((sender instanceof Player)? "you have been teleported to spawn by "+sender.getName() : "you have been teleported to spawn by console");
-                                player.teleport(locationFiler.getSpawnPoint());
+                            locationFiler.getSpawnPoint().getWorld().getChunkAtAsync(locationFiler.getSpawnPoint()).thenAccept(chunk -> {
+                                sender.getServer().getOnlinePlayers().forEach(player -> {
+                                    player.sendMessage((sender instanceof Player)? Messages.otherTargetByPlayer(messagesHandler, (Player) sender) : Messages.otherTargetByConsole(messagesHandler));
+                                    player.teleport(locationFiler.getSpawnPoint());
+                                });
+                                sender.sendMessage(Messages.otherCommanderAll(messagesHandler,sender.getServer().getOnlinePlayers().size()));
                             });
-                            sender.sendMessage("you teleported "+sender.getServer().getOnlinePlayers().size()+" to spawn");
                             return Command.SINGLE_SUCCESS;
                         }
                 )
