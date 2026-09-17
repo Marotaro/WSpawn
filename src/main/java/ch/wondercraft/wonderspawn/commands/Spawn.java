@@ -21,34 +21,34 @@ public class Spawn {
                     CommandSender sender = source.getSender();
                     Entity executor = source.getExecutor();
                     if (executor == null){
-                        sender.sendMessage(Messages.errorExecutorNull(messagesHandler));
+                        sender.sendMessage(messagesHandler.errorExecutorNull());
                         return Command.SINGLE_SUCCESS;
                     }
                     if (!(executor instanceof Player)){
-                        sender.sendMessage(Messages.errorExecutorNotAPlayer(messagesHandler));
+                        sender.sendMessage(messagesHandler.errorExecutorNotAPlayer());
                         return Command.SINGLE_SUCCESS;
                     }
                     if (sender instanceof Player player){
                         if (player.getUniqueId().equals(executor.getUniqueId())){
                             player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept( b -> {
-                                player.sendMessage((b)?Messages.self(messagesHandler): Messages.errorTeleportation(messagesHandler));
+                                player.sendMessage((b)?messagesHandler.spawnSelf(): messagesHandler.errorTeleportation());
                             });
                         } else {
                             executor.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
                                 if (b){
-                                    player.sendMessage(Messages.otherCommanderSingle(messagesHandler,(Player) executor));
-                                    executor.sendMessage(Messages.otherTargetByPlayer(messagesHandler,player));
+                                    player.sendMessage(messagesHandler.spawnOtherCommanderSingle((Player) executor));
+                                    executor.sendMessage(messagesHandler.spawnOtherTargetByPlayer(player));
                                 } else
-                                    player.sendMessage(Messages.errorTeleportation(messagesHandler));
+                                    player.sendMessage(messagesHandler.errorTeleportation());
                             });
                         }
                     } else {
                         executor.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
                             if (b){
-                                sender.sendMessage(Messages.otherCommanderSingle(messagesHandler,(Player) executor));
-                                executor.sendMessage(Messages.otherTargetByConsole(messagesHandler));
+                                sender.sendMessage(messagesHandler.spawnOtherCommanderSingle((Player) executor));
+                                executor.sendMessage(messagesHandler.spawnOtherTargetByConsole());
                             } else
-                                sender.sendMessage(Messages.errorTeleportation(messagesHandler));
+                                sender.sendMessage(messagesHandler.errorTeleportation());
                         });
                     }
                     return Command.SINGLE_SUCCESS;
@@ -62,25 +62,25 @@ public class Spawn {
                     if (sender instanceof Player player){
                         if (player.getUniqueId().equals(target.getUniqueId())){
                             player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
-                                player.sendMessage((b)?Messages.self(messagesHandler):Messages.errorTeleportation(messagesHandler));
+                                player.sendMessage((b)?messagesHandler.spawnSelf():messagesHandler.errorTeleportation());
                             });
                         } else {
                             target.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
                                 if (b){
-                                    player.sendMessage(Messages.otherCommanderSingle(messagesHandler,target));
-                                    target.sendMessage(Messages.otherTargetByPlayer(messagesHandler,player));
+                                    player.sendMessage(messagesHandler.spawnOtherCommanderSingle(target));
+                                    target.sendMessage(messagesHandler.spawnOtherTargetByPlayer(player));
                                 } else
-                                    player.sendMessage(Messages.errorTeleportation(messagesHandler));
+                                    player.sendMessage(messagesHandler.errorTeleportation());
                             });
                         }
                     } else {
 
                         target.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
                             if (b){
-                                sender.sendMessage(Messages.otherCommanderSingle(messagesHandler,target));
-                                target.sendMessage(Messages.otherTargetByConsole(messagesHandler));
+                                sender.sendMessage(messagesHandler.spawnOtherCommanderSingle(target));
+                                target.sendMessage(messagesHandler.spawnOtherTargetByConsole());
                             } else
-                                sender.sendMessage(Messages.errorTeleportation(messagesHandler));
+                                sender.sendMessage(messagesHandler.errorTeleportation());
                         });
                     }
                     return Command.SINGLE_SUCCESS;
@@ -93,10 +93,10 @@ public class Spawn {
                             CommandSender sender = source.getSender();
                             locationFiler.getSpawnPoint().getWorld().getChunkAtAsync(locationFiler.getSpawnPoint()).thenAccept(chunk -> {
                                 sender.getServer().getOnlinePlayers().forEach(player -> {
-                                    player.sendMessage((sender instanceof Player)? Messages.otherTargetByPlayer(messagesHandler, (Player) sender) : Messages.otherTargetByConsole(messagesHandler));
+                                    player.sendMessage((sender instanceof Player)? messagesHandler.spawnOtherTargetByPlayer((Player) sender) : messagesHandler.spawnOtherTargetByConsole());
                                     player.teleport(locationFiler.getSpawnPoint());
                                 });
-                                sender.sendMessage(Messages.otherCommanderAll(messagesHandler,sender.getServer().getOnlinePlayers().size()));
+                                sender.sendMessage(messagesHandler.spawnOtherCommanderAll(sender.getServer().getOnlinePlayers().size()));
                             });
                             return Command.SINGLE_SUCCESS;
                         }
