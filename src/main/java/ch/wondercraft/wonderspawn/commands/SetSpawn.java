@@ -1,6 +1,7 @@
 package ch.wondercraft.wonderspawn.commands;
 
 import ch.wondercraft.wonderspawn.LocationFiler;
+import ch.wondercraft.wonderspawn.message.MessagesHandler;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -17,7 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 public class SetSpawn {
-    public static LiteralArgumentBuilder<CommandSourceStack> create(LocationFiler locationFiler){
+    public static LiteralArgumentBuilder<CommandSourceStack> create(LocationFiler locationFiler, MessagesHandler messagesHandler){
         return Commands.literal("setspawn").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.set"))
                 .executes(context -> {
                     CommandSourceStack source = context.getSource();
@@ -29,8 +30,7 @@ public class SetSpawn {
                         return Command.SINGLE_SUCCESS;
                     }
                     locationFiler.setSpawnPoint(executor.getLocation());
-                    //todo change to custom message with message file
-                    sender.sendMessage("spawn correctly set at "+ executor.getLocation().getDirection().toString()+" in "+executor.getLocation().getWorld().getName());
+                    sender.sendMessage(messagesHandler.setSpawn(executor.getLocation()));
                     return Command.SINGLE_SUCCESS;
                 })
                 .then(
@@ -47,8 +47,7 @@ public class SetSpawn {
                                             RotationResolver rotationResolver = context.getArgument("rotation", RotationResolver.class);
                                             location.setRotation(rotationResolver.resolve(source));
                                             locationFiler.setSpawnPoint(location);
-                                            //todo change to custom message with message file
-                                            sender.sendMessage("spawn correctly set at "+ executor.getLocation().getDirection().toString()+" in "+executor.getLocation().getWorld().getName());
+                                            sender.sendMessage(messagesHandler.setSpawn(location));
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 )

@@ -1,8 +1,8 @@
 package ch.wondercraft.wonderspawn.commands;
 
 import ch.wondercraft.wonderspawn.LocationFiler;
-import ch.wondercraft.wonderspawn.message.Messages;
 import ch.wondercraft.wonderspawn.message.MessagesHandler;
+import ch.wondercraft.wonderspawn.waiters.SpawnWaiterRegistery;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -14,43 +14,36 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class Spawn {
-    public static LiteralArgumentBuilder<CommandSourceStack> create(LocationFiler locationFiler, MessagesHandler messagesHandler){
+    public static LiteralArgumentBuilder<CommandSourceStack> create(LocationFiler locationFiler, MessagesHandler messagesHandler, SpawnWaiterRegistery spawnWaiterRegistery){
         return Commands.literal("spawn").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.spawn")).executes(
                 commandContext -> {
                     CommandSourceStack source = commandContext.getSource();
                     CommandSender sender = source.getSender();
                     Entity executor = source.getExecutor();
-                    if (executor == null){
-                        sender.sendMessage(messagesHandler.errorExecutorNull());
-                        return Command.SINGLE_SUCCESS;
-                    }
-                    if (!(executor instanceof Player)){
-                        sender.sendMessage(messagesHandler.errorExecutorNotAPlayer());
-                        return Command.SINGLE_SUCCESS;
-                    }
                     if (sender instanceof Player player){
-                        if (player.getUniqueId().equals(executor.getUniqueId())){
-                            player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept( b -> {
-                                player.sendMessage((b)?messagesHandler.spawnSelf(): messagesHandler.errorTeleportation());
-                            });
-                        } else {
-                            executor.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
-                                if (b){
-                                    player.sendMessage(messagesHandler.spawnOtherCommanderSingle((Player) executor));
-                                    executor.sendMessage(messagesHandler.spawnOtherTargetByPlayer(player));
-                                } else
-                                    player.sendMessage(messagesHandler.errorTeleportation());
-                            });
-                        }
-                    } else {
-                        executor.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
-                            if (b){
-                                sender.sendMessage(messagesHandler.spawnOtherCommanderSingle((Player) executor));
-                                executor.sendMessage(messagesHandler.spawnOtherTargetByConsole());
-                            } else
-                                sender.sendMessage(messagesHandler.errorTeleportation());
-                        });
-                    }
+                        if (executor instanceof Player target){
+                            if (player.equals(target)){
+                                spawnWaiterRegistery.addDemand(player).thenAccept(demandOutCome -> {
+                                    if (demandOutCome== SpawnWaiterRegistery.DemandOutCome.ACCEPT){
+                                        player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(success ->{
+                                            if (success)
+                                                player.sendMessage(messagesHandler.spawnSelf());
+                                            else
+                                                player.sendMessage(messagesHandler.errorTeleportation());
+                                        });
+                                    } else if (demandOutCome== SpawnWaiterRegistery.DemandOutCome.MOVED) {
+                                        player.sendMessage(messagesHandler.moved());
+                                    } else if (demandOutCome== SpawnWaiterRegistery.DemandOutCome.DEMANDS){
+                                        player.sendMessage(messagesHandler.newDemand());
+                                    }
+                                });
+                            } else {
+                                player.sendMessage(messagesHandler.errorNotSelf());
+                            }
+                        } else
+                            player.sendMessage(messagesHandler.errorNotSelf());
+                    } else
+                        sender.sendMessage("only players can use this command");
                     return Command.SINGLE_SUCCESS;
                 }
         ).then(Commands.argument("player", ArgumentTypes.player()).requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.spawn.other")).executes(
@@ -61,8 +54,19 @@ public class Spawn {
                     Player target = targetResolver.resolve(source).getFirst();
                     if (sender instanceof Player player){
                         if (player.getUniqueId().equals(target.getUniqueId())){
-                            player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{
-                                player.sendMessage((b)?messagesHandler.spawnSelf():messagesHandler.errorTeleportation());
+                            spawnWaiterRegistery.addDemand(player).thenAccept(demandOutCome -> {
+                                if (demandOutCome== SpawnWaiterRegistery.DemandOutCome.ACCEPT){
+                                    player.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(success ->{
+                                        if (success)
+                                            player.sendMessage(messagesHandler.spawnSelf());
+                                        else
+                                            player.sendMessage(messagesHandler.errorTeleportation());
+                                    });
+                                } else if (demandOutCome== SpawnWaiterRegistery.DemandOutCome.MOVED) {
+                                    player.sendMessage(messagesHandler.moved());
+                                } else if (demandOutCome== SpawnWaiterRegistery.DemandOutCome.DEMANDS){
+                                    player.sendMessage(messagesHandler.newDemand());
+                                }
                             });
                         } else {
                             target.teleportAsync(locationFiler.getSpawnPoint()).thenAccept(b->{

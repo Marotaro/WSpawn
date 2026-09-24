@@ -69,6 +69,14 @@ public class MessagesHandler {
         return build("spawn.self");
     }
 
+    public Component moved(){
+        return build("spawn.moved");
+    }
+
+    public Component newDemand(){
+        return build("spawn.newdemand");
+    }
+
     public Component spawnOtherTargetByPlayer(Player commander){
         return build("spawn.other.target.by-player",
                 Placeholder.unparsed("commander", commander.getName()));
@@ -100,5 +108,17 @@ public class MessagesHandler {
         return build("spawn.error.executor.not_a_player");
     }
 
+    public Component errorNotSelf(){return build("spawn.error.notself");}
+
+    public Component setSpawn(Location location){
+        return build("set",
+                Placeholder.unparsed("location_x",String.valueOf(location.getX())),
+                Placeholder.unparsed("location_y",String.valueOf(location.getY())),
+                Placeholder.unparsed("location_z",String.valueOf(location.getZ())),
+                Placeholder.unparsed("location_world",location.getWorld().getName()),
+                Placeholder.unparsed("location_yaw", String.valueOf(location.getYaw())),
+                Placeholder.unparsed("location_pitch",String.valueOf(location.getPitch()))
+                );
+    }
 }
 
