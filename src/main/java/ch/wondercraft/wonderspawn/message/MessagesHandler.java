@@ -111,7 +111,7 @@ public class MessagesHandler {
     public Component errorNotSelf(){return build("spawn.error.notself");}
 
     public Component setSpawn(Location location){
-        return build("set",
+        return build("set.spawn",
                 Placeholder.unparsed("location_x",String.valueOf(location.getX())),
                 Placeholder.unparsed("location_y",String.valueOf(location.getY())),
                 Placeholder.unparsed("location_z",String.valueOf(location.getZ())),
