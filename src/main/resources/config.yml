@@ -1,2 +1,11 @@
-
-teleportdelay: 15
+teleportation:
+  delay: 15
+  fog: true
+  waiting-sound:
+    name: "minecraft:ui.toast.challenge.complete"
+    volume: 1
+    pitch: 1.75
+  timer-display:
+    active: true
+    text: "rest for <time>"
+    color: "BLUE"
