@@ -1,11 +1,28 @@
 teleportation:
   delay: 15
+  can-move: false
   fog: true
-  waiting-sound:
-    name: "minecraft:ui.toast.challenge.complete"
+  initial-sound:
+    active: true
+    name: "minecraft:block.note_block.bell"
     volume: 1
-    pitch: 1.75
+    pitch: 1
+  per-second-sound:
+    active: true
+    name: "minecraft:block.glass.break"
+    volume: 1
+    pitch: 1
+  final-sound:
+    active: true
+    name: "minecraft:block.amethyst_block.break"
+    volume: 1
+    pitch: 1
+  moved-sound:
+    active: true
+    name: "minecraft:block.note_block.bass"
+    volume: 1
+    pitch: 0.5
   timer-display:
     active: true
-    text: "rest for <time>"
-    color: "BLUE"
+    text: "<dark_purple>✦</dark_purple> <light_purple>Téléportation dans</light_purple> <yellow><bold><time>s</bold></yellow> <dark_purple>✦</dark_purple>"
+    color: "PURPLE"

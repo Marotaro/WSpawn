@@ -19,6 +19,7 @@ spawn:
     executor:
       null: "You cannot use spawn commands without an executor"
       not_a_player: "Executor needs to be a player"
+  moved: "<red>You moved, teleportation canceled!</red>"
 set:
   spawn: "<location_x>,<location_y>,<location_z>,<location_world>,<location_yaw>,<location_pitch>"
   error: "needs an executor"

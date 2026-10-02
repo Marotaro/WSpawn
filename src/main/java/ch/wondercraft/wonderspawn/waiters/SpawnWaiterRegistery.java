@@ -2,7 +2,6 @@ package ch.wondercraft.wonderspawn.waiters;
 
 
 import ch.wondercraft.wonderspawn.utils.PermissionFinder;
-import io.papermc.paper.util.Tick;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -23,6 +22,7 @@ public class SpawnWaiterRegistery implements Runnable{
     private final Plugin plugin;
     private final ConcurrentHashMap<UUID, SpawnDemand> spawnDemands = new ConcurrentHashMap<>();
     private final YamlConfiguration configuration;
+    private final SoundSetting soundSetting = new SoundSetting();
 
     private final int TICK_IN_SECOND = 20;
 
@@ -45,8 +45,9 @@ public class SpawnWaiterRegistery implements Runnable{
         if (perm > -1) {
             time = perm * TICK_IN_SECOND;
         }
-        if (time == 0)
+        if (time == 0) {
             return CompletableFuture.completedFuture(DemandOutCome.ACCEPT);
+        }
         CompletableFuture<DemandOutCome> future = new CompletableFuture<>();
         int finalTime = time;
         spawnDemands.compute(player.getUniqueId(),(id, sd)->{
@@ -62,7 +63,8 @@ public class SpawnWaiterRegistery implements Runnable{
            SpawnDemand spawnDemand = new SpawnDemand(finalTime, player.getLocation(), future, fog);
            if (configuration.getBoolean("teleportation.timer-display.active"))
                player.showBossBar(spawnDemand.timerDisplay);
-           player.playSound(player.getLocation(), configuration.getString("teleportation.waiting-sound.name"),(float)configuration.getDouble("teleportation.waiting-sound.volume",1),(float)configuration.getDouble("teleportation.waiting-sound.pitch",1));
+           if (soundSetting.active("initial-sound"))
+               player.playSound(player.getLocation(), soundSetting.name("initial-sound"),soundSetting.volume("initial-sound"), soundSetting.pitch("initial-sound"));
            return spawnDemand ;
         });
         return future;
@@ -70,6 +72,14 @@ public class SpawnWaiterRegistery implements Runnable{
 
     @Override
     public void run() {
+        boolean perSecondSound = soundSetting.active("per-second-sound");
+        String perSecondSoundName = soundSetting.name("per-second-sound");
+        float perSecondSoundVolume = soundSetting.volume("per-second-sound");
+        float perSecondSoundPitch = soundSetting.pitch("per-second-sound");
+        boolean movedSound = soundSetting.active("moved-sound");
+        String movedSoundName = soundSetting.name("moved-sound");
+        float movedSoundVolume = soundSetting.volume("moved-sound");
+        float movedSoundPitch = soundSetting.pitch("moved-sound");
         for (UUID uuid : spawnDemands.keySet()){
             Player player = Bukkit.getPlayer(uuid);
             SpawnDemand spawnDemand = spawnDemands.get(uuid);
@@ -77,11 +87,19 @@ public class SpawnWaiterRegistery implements Runnable{
                 spawnDemands.remove(uuid);
                 spawnDemand.future.complete(DemandOutCome.QUIT);
             } else {
+                String perm = "wspawn.teleportation.can-move";
+                boolean canMove = player.isPermissionSet(perm)
+                        ? player.hasPermission(perm)
+                        : configuration.getBoolean("teleportation.can-move");
                 if (spawnDemand.time <= 0) {
                     spawnDemand.future.complete(DemandOutCome.ACCEPT);
-                } else if (!player.getLocation().getBlock().equals(spawnDemand.location.getBlock())){
+                } else if (!canMove&&!player.getLocation().getBlock().equals(spawnDemand.location.getBlock())){
+                    if (movedSound)
+                        player.playSound(player.getLocation(),movedSoundName,movedSoundVolume,movedSoundPitch);
                     spawnDemand.future.complete(DemandOutCome.MOVED);
                 } else {
+                    if (perSecondSound&&spawnDemand.time!=spawnDemand.baseTime&&spawnDemand.time%TICK_IN_SECOND==0)
+                        player.playSound(player.getLocation(),perSecondSoundName,perSecondSoundVolume,perSecondSoundPitch);
                     spawnDemand.updateTime(-1);
                     spawnDemand.updateTimerDisplay();
                     continue;
@@ -119,7 +137,7 @@ public class SpawnWaiterRegistery implements Runnable{
 
         private Component makeComponent() {
             TagResolver tagResolver = TagResolver.resolver(
-                    Placeholder.unparsed("time",String.valueOf(time/20+1))
+                    Placeholder.unparsed("time",String.valueOf(time/TICK_IN_SECOND+1))
             );
             String title = configuration.getString("teleportation.timer-display.text");
             if (title==null){
@@ -137,6 +155,21 @@ public class SpawnWaiterRegistery implements Runnable{
             timerDisplay.progress((float) (time)/baseTime);
         }
     };
+
+    private final class SoundSetting {
+        private boolean active(String name){
+            return configuration.getBoolean("teleportation."+name+".active");
+        }
+        private String name(String name){
+            return configuration.getString("teleportation."+name+".name");
+        }
+        private float volume(String name){
+            return (float)configuration.getDouble("teleportation."+name+".volume");
+        }
+        private float pitch(String name){
+            return (float)configuration.getDouble("teleportation."+name+".pitch");
+        }
+    }
 
     public enum DemandOutCome{
         ACCEPT, MOVED, DEMANDS, QUIT;
