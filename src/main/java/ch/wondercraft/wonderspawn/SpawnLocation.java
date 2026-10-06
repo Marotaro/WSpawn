@@ -9,7 +9,10 @@ import java.io.File;
 import java.nio.file.NoSuchFileException;
 
 public class SpawnLocation extends Location {
-    private SpawnLocation(Location location){
+    private final File spawnFile;
+
+    private SpawnLocation(Location location, File spawnFile){
+        this.spawnFile = spawnFile;
         super(location.getWorld(),location.getX(),location.getY(),location.getZ(),location.getYaw(),location.getPitch());
     }
 
@@ -25,8 +28,8 @@ public class SpawnLocation extends Location {
         return location;
     }
 
-    public static SpawnLocation load(@NotNull File spawnFile)throws NoSuchFileException,IllegalArgumentException{
-        return new SpawnLocation(read(spawnFile));
+    public static SpawnLocation load(@NotNull File spawnFile) throws NoSuchFileException,IllegalArgumentException{
+        return new SpawnLocation(read(spawnFile),spawnFile);
     }
 
     public void update(@NotNull Location l){
@@ -36,4 +39,7 @@ public class SpawnLocation extends Location {
         setPitch(l.getPitch());
     }
 
+    public void reload() throws NoSuchFileException,IllegalArgumentException{
+        this.update(read(this.spawnFile));
+    }
 }
