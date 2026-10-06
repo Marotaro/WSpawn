@@ -1,30 +1,6 @@
 name: WSpawn
 version: '0.0.0-SNAPSHOT'
 main: ch.wondercraft.wonderspawn.WSpawn
-description: An example plugin
+description: An somewhat customizable spawn plugin
 api-version: '26.1.2'
 permissions:
-  wspawn.spawn:
-    description: "Autorise l'utilisation du /spawn"
-    default: true
-  wspawn.spawn.other:
-    description: "Autorise la teleportation d'un joueur externe"
-    default: op
-  wspawn.setspawn:
-    description: "Autorise l'utilisation du /setspawn"
-    default: op
-  wspawn.setspawn.here:
-    description: "autorise l'utilisation du /setspawn here"
-    default: op
-  wspawn.setspawn.coords:
-    description: "autorise l'utilisation du /setspawn coords"
-    default: op
-  wspawn.setspawn.full:
-    description: "autorise l'utilisation du /setspawn full"
-    default: op
-  wspawn.teleportdelay.bypass:
-    description: ""
-    default: op
-  wspawn.teleportdelay.time:
-    description: ""
-    default: op
