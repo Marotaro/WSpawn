@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,11 +17,13 @@ public class TeleportationAction implements Runnable {
         this.spawnLocation = spawnLocation;
     }
 
-    public void putPlayerTeleportation(Player player,boolean acceptMove, int waitTicks, CompletableFuture<TeleportationOutCome> outCome){
+    public CompletableFuture<TeleportationOutCome> putPlayerTeleportation(Player player,boolean acceptMove, int waitTicks, CompletableFuture<TeleportationOutCome> outCome){
+        CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
         if (playersTeleportationInfo.contains(player)){
             playersTeleportationInfo.get(player).outCome.complete(TeleportationOutCome.CANCELED);
         }
-        playersTeleportationInfo.put(player,new TeleportationInfo(player.getLocation(),acceptMove,waitTicks,outCome));
+        playersTeleportationInfo.put(player,new TeleportationInfo(player.getLocation(),acceptMove,waitTicks,future));
+        return future;
     }
 
     @Override
@@ -52,7 +55,11 @@ public class TeleportationAction implements Runnable {
         }
     }
 
-    private class TeleportationInfo{
+    public TeleportationInfo getPlayerTeleportationInfo(Player player){
+        return playersTeleportationInfo.get(player);
+    }
+
+    public class TeleportationInfo{
         private final Location playerLocation;
         private final boolean acceptMove;
         private int baseTicks;
@@ -68,6 +75,14 @@ public class TeleportationAction implements Runnable {
 
         private void update(){
             elapsedTicks+=1;
+        }
+
+        public int remainingTicks(){
+            return baseTicks-elapsedTicks;
+        }
+
+        public int getBaseTicks(){
+            return baseTicks;
         }
     }
 }
