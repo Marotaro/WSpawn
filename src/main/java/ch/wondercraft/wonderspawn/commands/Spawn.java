@@ -19,10 +19,10 @@ public class Spawn {
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (sender instanceof Player player){
-                        teleportationService.requestTeleportation(player,10,true).thenAccept(
+                        teleportationService.requestTeleportation(player,100,true).thenAccept(
                                 teleportationOutCome -> {
                                     if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS) {
-                                        text.spawn();
+                                        player.sendMessage(text.spawn());
                                     }
                                 }
                         );

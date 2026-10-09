@@ -89,6 +89,13 @@ public class ConfigManager {
         } catch (NoSuchFileException | IllegalArgumentException e){
             throw new ConfigException("sounds.yml", e.getMessage(), e);
         }
+        this.sounds = newSounds;
+        try {
+            newSpawnLocation = SpawnLocation.load(spawnFile);
+        } catch (NoSuchFileException | IllegalArgumentException e){
+            throw new ConfigException("spawnLocation.yml", e.getMessage(),e);
+        }
+        this.spawnLocation = newSpawnLocation;
         try {
             newTextString =TextString.load(lang);
             text = new Text(spawnLocation,newTextString);
@@ -100,14 +107,7 @@ public class ConfigManager {
         } catch (NoSuchFileException | IllegalArgumentException e){
             throw new ConfigException("config.yml", e.getMessage(), e);
         }
-        try {
-            newSpawnLocation = SpawnLocation.load(spawnFile);
-        } catch (NoSuchFileException | IllegalArgumentException e){
-            throw new ConfigException("spawnLocation.yml", e.getMessage(),e);
-        }
-        this.sounds = newSounds;
         this.timerDisplay = newTimer;
-        this.spawnLocation = newSpawnLocation;
     }
 
     public void reload() throws ConfigException{

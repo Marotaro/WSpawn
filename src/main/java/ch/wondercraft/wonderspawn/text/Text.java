@@ -33,16 +33,24 @@ public class Text {
             return mm.deserialize(text,TagResolver.builder().resolver(locationReslover).resolvers(tagResolvers).build());
 
         } catch (NullPointerException e){
-            return Component.text(messageKey+" does not exist in lang file", NamedTextColor.DARK_PURPLE);
+            return Component.text(messageKey+" does not exist in lang file "+e.getMessage(), NamedTextColor.DARK_PURPLE);
         }
     }
 
     public Component spawn(){
-        return build("Spawn");
+        return build("spawn.self");
+    }
+
+    private Component timer(int remainingSecond, String key){
+        return build(key,Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
     }
 
     public Component bar(int remainingSecond){
-        return build("bar",
-                Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
+        return timer(remainingSecond,"timer.bar");
     }
+    public Component tchat(int remainingSecond){
+        return timer(remainingSecond,"timer.tchat");
+    }
+
+
 }

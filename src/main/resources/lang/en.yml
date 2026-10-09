@@ -1,0 +1,6 @@
+prefix: "[WSpawn]"
+spawn:
+  self: "you were teleported at <spawn-x>,<spawn-y>,<spawn-z>"
+timer:
+  bar: "stay still for <remaining-second>"
+  tchat: "stay still for <remaining-second>"

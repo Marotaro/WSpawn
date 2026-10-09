@@ -1,0 +1,17 @@
+sounds:
+  initial:
+    name: "minecraft:block.anvil.fall"
+    volume: 1
+    pitch: 1
+  interval:
+    name: "minecraft:block.bamboo.fall"
+    volume: 1
+    pitch: 1
+  final:
+    name: "minecraft:ancien_debris.fall"
+    volume: 1
+    pitch: 1
+  error:
+    name: "minecraft:block.beehive.enter"
+    volume: 1
+    pitch: 1

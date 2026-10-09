@@ -1,0 +1,8 @@
+lang: "en"
+timer-display:
+  color: "BLUE"
+  active: true
+  flag:
+    - DARKEN_SCREEN
+    - PLAY_BOSS_MUSIC
+    - CREATE_WORLD_FOG

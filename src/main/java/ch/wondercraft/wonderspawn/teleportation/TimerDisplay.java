@@ -26,6 +26,7 @@ public class TimerDisplay {
     private void apply(Data data){
         this.barColor = data.color();
         this.active = data.active();
+        this.flags = data.flags;
     }
 
     private static Data read(File configFile, Text text) throws NoSuchFileException,IllegalArgumentException{
