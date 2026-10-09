@@ -1,6 +1,7 @@
 name: WSpawn
 version: '0.0.0-SNAPSHOT'
 main: ch.wondercraft.wonderspawn.WSpawn
-description: An somewhat customizable spawn plugin
+description: An somewhat customizable Spawn plugin
 api-version: '26.1.2'
 permissions:
+  wspawn.spawn:
