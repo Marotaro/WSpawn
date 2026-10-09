@@ -1,8 +1,7 @@
-package ch.wondercraft.wonderspawn;
+package ch.wondercraft.wonderspawn.text;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -34,7 +33,11 @@ public class Text {
             return mm.deserialize(text,TagResolver.builder().resolver(locationReslover).resolvers(tagResolvers).build());
 
         } catch (NullPointerException e){
-            return Component.text(e.getMessage()+" does not exist in lang file", NamedTextColor.DARK_PURPLE);
+            return Component.text(messageKey+" does not exist in lang file", NamedTextColor.DARK_PURPLE);
         }
+    }
+
+    public Component spawn(){
+        return build("spawn");
     }
 }

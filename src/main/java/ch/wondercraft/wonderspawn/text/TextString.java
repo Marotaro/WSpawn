@@ -1,4 +1,4 @@
-package ch.wondercraft.wonderspawn;
+package ch.wondercraft.wonderspawn.text;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
