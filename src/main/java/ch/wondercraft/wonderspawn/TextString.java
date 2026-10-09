@@ -35,7 +35,7 @@ public class TextString {
         read();
     }
 
-    public String getText(String key){
+    public String getText(String key) throws NullPointerException{
         return textMap.get(key);
     }
 }
