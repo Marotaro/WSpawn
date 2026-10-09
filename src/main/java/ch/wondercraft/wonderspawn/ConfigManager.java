@@ -3,6 +3,8 @@ package ch.wondercraft.wonderspawn;
 import ch.wondercraft.wonderspawn.commands.Spawn;
 import ch.wondercraft.wonderspawn.teleportation.TimerDisplay;
 import ch.wondercraft.wonderspawn.teleportation.sounds.SoundNotification;
+import ch.wondercraft.wonderspawn.text.Text;
+import ch.wondercraft.wonderspawn.text.TextString;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -23,6 +25,8 @@ public class ConfigManager {
 
     private final Plugin plugin;
     private SoundNotification sounds;
+    private TextString textString;
+    private Text text;
     private TimerDisplay timerDisplay;
     private SpawnLocation spawnLocation;
 
@@ -77,6 +81,7 @@ public class ConfigManager {
         File spawnFile = ensureSpawn();
 
         SoundNotification newSounds;
+        TextString newTextString;
         TimerDisplay newTimer;
         SpawnLocation newSpawnLocation;
         try {
@@ -85,7 +90,13 @@ public class ConfigManager {
             throw new ConfigException("sounds.yml", e.getMessage(), e);
         }
         try {
-            newTimer = TimerDisplay.load(config,lang);
+            newTextString =TextString.load(lang);
+            text = new Text(spawnLocation,newTextString);
+        } catch (NoSuchFileException | IllegalArgumentException e){
+            throw new ConfigException("lang/---.yml", e.getMessage(), e);
+        }
+        try {
+            newTimer = TimerDisplay.load(config,text);
         } catch (NoSuchFileException | IllegalArgumentException e){
             throw new ConfigException("config.yml", e.getMessage(), e);
         }
@@ -122,7 +133,8 @@ public class ConfigManager {
         }
     }
 
-    public SoundNotification getSounds(){return sounds;}
+    public SoundNotification sounds(){return sounds;}
     public TimerDisplay timerDisplay(){return timerDisplay;}
     public SpawnLocation spawnLocation(){return spawnLocation;}
+    public Text text(){return text;}
 }

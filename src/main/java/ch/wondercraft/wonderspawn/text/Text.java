@@ -23,12 +23,12 @@ public class Text {
                 text = text.replace("<prefix>",textString.getText("prefix"));
             }
             TagResolver locationReslover = TagResolver.resolver(
-                    Placeholder.unparsed("Spawn-x",String.valueOf(spawnLocation.getBlockX())),
-                    Placeholder.unparsed("Spawn-y",String.valueOf(spawnLocation.getBlockY())),
-                    Placeholder.unparsed("Spawn-z",String.valueOf(spawnLocation.getBlockZ())),
-                    Placeholder.unparsed("Spawn-world",spawnLocation.getWorld().getName()),
-                    Placeholder.unparsed("Spawn-yaw",String.valueOf(spawnLocation.getYaw())),
-                    Placeholder.unparsed("Spawn-pitch",String.valueOf(spawnLocation.getPitch()))
+                    Placeholder.unparsed("spawn-x",String.valueOf(spawnLocation.getBlockX())),
+                    Placeholder.unparsed("spawn-y",String.valueOf(spawnLocation.getBlockY())),
+                    Placeholder.unparsed("spawn-z",String.valueOf(spawnLocation.getBlockZ())),
+                    Placeholder.unparsed("spawn-world",spawnLocation.getWorld().getName()),
+                    Placeholder.unparsed("spawn-yaw",String.valueOf(spawnLocation.getYaw())),
+                    Placeholder.unparsed("spawn-pitch",String.valueOf(spawnLocation.getPitch()))
             );
             return mm.deserialize(text,TagResolver.builder().resolver(locationReslover).resolvers(tagResolvers).build());
 
@@ -39,5 +39,10 @@ public class Text {
 
     public Component spawn(){
         return build("Spawn");
+    }
+
+    public Component bar(int remainingSecond){
+        return build("bar",
+                Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
     }
 }

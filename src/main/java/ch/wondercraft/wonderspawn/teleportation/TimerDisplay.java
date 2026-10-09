@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
+import ch.wondercraft.wonderspawn.text.Text;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,15 +12,14 @@ import java.util.stream.Collectors;
 
 public class TimerDisplay {
     private final File configFile;
-    private final File langFile;
+    private final Text text;
     private BossBar.Color barColor;
-    private String text = "ahah"; //hardcoded one, waiting for text manager
     private boolean active;
     private Set<BossBar.Flag> flags;
 
-    private TimerDisplay(File configFile, File langFile, Data data){
+    private TimerDisplay(File configFile, Text text, Data data){
         this.configFile = configFile;
-        this.langFile = langFile;
+        this.text = text;
         apply(data);
     }
 
@@ -28,32 +28,28 @@ public class TimerDisplay {
         this.active = data.active();
     }
 
-    private static Data read(File configFile, File langFile) throws NoSuchFileException,IllegalArgumentException{
+    private static Data read(File configFile, Text text) throws NoSuchFileException,IllegalArgumentException{
         if (!configFile.exists()){
             throw new NoSuchFileException("config file does not exist");
         }
-        if (!langFile.exists()){
-            throw new NoSuchFileException("lang file does not exist");
-        }
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-        YamlConfiguration lang = YamlConfiguration.loadConfiguration(langFile);
+
         BossBar.Color color = BossBar.Color.valueOf(config.getString("timer-display.color","RED"));
         boolean active = config.getBoolean("timer-display.active");
         Set<BossBar.Flag> flags = config.getStringList("timer-display.flag").stream().map(BossBar.Flag::valueOf).collect(Collectors.toSet());
-        String a = "ahah";
         return new Data(color,active,flags);
     }
 
-    public static TimerDisplay load(File configFile, File langFile) throws NoSuchFileException,IllegalArgumentException{
-        return new TimerDisplay(configFile,langFile,read(configFile,langFile));
+    public static TimerDisplay load(File configFile, Text text) throws NoSuchFileException,IllegalArgumentException{
+        return new TimerDisplay(configFile,text,read(configFile,text));
     }
 
     public void reload() throws NoSuchFileException{
-        apply(read(this.configFile,this.langFile));
+        apply(read(this.configFile,this.text));
     }
 
-    public BossBar create(){
-        return BossBar.bossBar(Component.text(text),1f,barColor, BossBar.Overlay.PROGRESS,flags);
+    public BossBar create(int remainingSecond){
+        return BossBar.bossBar(text.bar(remainingSecond),1f,barColor, BossBar.Overlay.PROGRESS,flags);
     }
 
     public boolean isActive(){

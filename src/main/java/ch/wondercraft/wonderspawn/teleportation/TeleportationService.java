@@ -1,7 +1,9 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
 import ch.wondercraft.wonderspawn.teleportation.sounds.SoundNotification;
+import ch.wondercraft.wonderspawn.text.Text;
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -15,14 +17,17 @@ public class TeleportationService {
     private final TeleportationAction teleportationAction;
     private final SoundNotification soundNotification;
     private final TimerDisplay timerDisplay;
+    private final Text text;
     private final boolean tickBarUpdate = true;
 
     public TeleportationService(Plugin plugin, Location spawnLocation,
-                                SoundNotification soundNotification, TimerDisplay timerDisplay){
+                                SoundNotification soundNotification, TimerDisplay timerDisplay,
+                                Text text){
         this.plugin = plugin;
         this.teleportationAction = new TeleportationAction(spawnLocation);
         this.soundNotification = soundNotification;
         this.timerDisplay = timerDisplay;
+        this.text = text;
         Bukkit.getScheduler().runTaskTimer(plugin,teleportationAction,1L,1L);
     }
 
@@ -30,7 +35,7 @@ public class TeleportationService {
         if (waitTicks > 0){
             soundNotification.INITIAL.play(player);
         }
-        BossBar bar = timerDisplay.isActive()? timerDisplay.create() : null;
+        BossBar bar = timerDisplay.isActive()? timerDisplay.create(waitTicks/20) : null;
         if (bar != null) player.showBossBar(bar);
 
         CompletableFuture<TeleportationOutCome> future = teleportationAction.putPlayerTeleportation(player, canMove, waitTicks);
@@ -39,6 +44,7 @@ public class TeleportationService {
             TeleportationAction.TeleportationInfo teleportationInfo = teleportationAction.getPlayerTeleportationInfo(player);
             if (teleportationInfo!=null&&bar!=null){
                 bar.progress(Math.max(0f,(float) teleportationInfo.remainingTicks()/teleportationInfo.getBaseTicks()));
+                bar.name(text.bar(teleportationInfo.remainingTicks()/20));
             }
         },0L, tickBarUpdate? 1L:20L);
         BukkitTask soundsInterval = Bukkit.getScheduler().runTaskTimer(plugin,()->{
