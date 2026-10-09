@@ -1,4 +1,4 @@
-package ch.wondercraft.wonderspawn;
+package ch.wondercraft.wonderspawn.teleportation;
 
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;

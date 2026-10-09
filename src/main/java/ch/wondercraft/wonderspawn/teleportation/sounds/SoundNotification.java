@@ -1,4 +1,4 @@
-package ch.wondercraft.wonderspawn.sounds;
+package ch.wondercraft.wonderspawn.teleportation.sounds;
 
 import java.io.File;
 import java.nio.file.NoSuchFileException;

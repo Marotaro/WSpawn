@@ -1,10 +1,7 @@
-package ch.wondercraft.wonderspawn;
+package ch.wondercraft.wonderspawn.teleportation;
 
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +14,7 @@ public class TeleportationAction implements Runnable {
         this.spawnLocation = spawnLocation;
     }
 
-    public CompletableFuture<TeleportationOutCome> putPlayerTeleportation(Player player,boolean acceptMove, int waitTicks, CompletableFuture<TeleportationOutCome> outCome){
+    public CompletableFuture<TeleportationOutCome> putPlayerTeleportation(Player player,boolean acceptMove, int waitTicks){
         CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
         if (playersTeleportationInfo.contains(player)){
             playersTeleportationInfo.get(player).outCome.complete(TeleportationOutCome.CANCELED);

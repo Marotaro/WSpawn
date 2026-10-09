@@ -1,4 +1,4 @@
-package ch.wondercraft.wonderspawn.sounds;
+package ch.wondercraft.wonderspawn.teleportation.sounds;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
