@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
 public class SpawnLocation extends Location {
@@ -37,6 +38,16 @@ public class SpawnLocation extends Location {
         set(l.getX(),l.getY(),l.getZ());
         setYaw(l.getYaw());
         setPitch(l.getPitch());
+    }
+
+    public void save(){
+        YamlConfiguration yamlConfiguration = new YamlConfiguration();
+        yamlConfiguration.set("spawn-location",(Location)this);
+        try {
+            yamlConfiguration.save(spawnFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void reload() throws NoSuchFileException,IllegalArgumentException{

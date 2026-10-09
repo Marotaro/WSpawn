@@ -10,7 +10,7 @@ import java.io.File;
 import java.nio.file.NoSuchFileException;
 
 public class SoundNotificationType {
-    private final String key;
+    protected final String key;
     private String name;
     private float volume;
     private float pitch;
@@ -20,15 +20,15 @@ public class SoundNotificationType {
         apply(data);
     }
 
-    private record Data(String name, float volume, float pitch){}
+    public record Data(String name, float volume, float pitch){}
 
-    private void apply(Data data){
+    protected void apply(Data data){
         this.name = data.name();
         this.volume = data.volume();
         this.pitch = data.pitch();
     }
 
-    private static Data read(File config, String key) throws NoSuchFileException,IllegalArgumentException{
+    protected static Data read(File config, String key) throws NoSuchFileException,IllegalArgumentException{
         if (!config.exists()){
             throw new NoSuchFileException("sounds file does not exist");
         }
