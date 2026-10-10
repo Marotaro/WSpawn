@@ -1,6 +1,17 @@
-prefix: "[WSpawn]"
+prefix: "<dark_gray>[<gradient:#55ffff:#5555ff>WSpawn</gradient><dark_gray>] <gray>"
+
 spawn:
-  self: "you were teleported at <spawn-x>,<spawn-y>,<spawn-z>"
+  self:
+    promise: "<prefix><green>You will be teleported to the spawn in <white><remaining-second><green>s."
+    confirmation: "<prefix><green>You were teleported to the spawn <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>."
+    error:
+      moved: "<prefix><red>You moved try again!"
+  forced:
+    target: "<prefix><yellow>You were teleported to the spawn by <white><sender><yellow>."
+    sender: "<green>You teleported <white><target> <green>to the spawn."
+    error:
+      more-than-one: "<red>You cannot force spawn more than one player at a time"
+
 timer:
-  bar: "stay still for <remaining-second>"
-  tchat: "stay still for <remaining-second>"
+  bar: "<red>Stay still for <white><remaining-second>s"
+  chat: "<red>Stay still for <white><remaining-second>s"

@@ -36,6 +36,7 @@ public class WSpawn extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable(){
-        configManager.spawnLocation().save();
+        if (configManager.spawnLocation() !=null)
+            configManager.spawnLocation().save();
     }
 }

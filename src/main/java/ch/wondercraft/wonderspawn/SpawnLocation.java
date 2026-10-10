@@ -42,7 +42,7 @@ public class SpawnLocation extends Location {
 
     public void save(){
         YamlConfiguration yamlConfiguration = new YamlConfiguration();
-        yamlConfiguration.set("spawn-location",(Location)this);
+        yamlConfiguration.set("spawn-location",new Location(getWorld(),getX(),getY(),getZ(),getYaw(),getPitch()));
         try {
             yamlConfiguration.save(spawnFile);
         } catch (IOException e) {

@@ -6,6 +6,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class Text {
     private  MiniMessage mm = MiniMessage.builder().build();
@@ -37,19 +39,42 @@ public class Text {
         }
     }
 
-    public Component spawn(){
-        return build("spawn.self");
+    public Component spawnPromise(int remainingSecond){
+        return textWithRemainingSecond(remainingSecond,"spawn.self.promise");
     }
 
-    private Component timer(int remainingSecond, String key){
+    public Component spawnConfirmation(){
+        return build("spawn.self.confirmation");
+    }
+
+
+
+    public Component forcedSpawnNotice(CommandSender sender){
+        return build("spawn.forced.target",
+                Placeholder.unparsed("sender",sender.getName())
+                );
+    }
+
+    public Component forcedSpawnConfirmation(Player target){
+        return build("spawn.forced.sender",
+                Placeholder.unparsed("target",target.getName())
+        );
+    }
+
+    public Component forcedSpawnTryMoreThanOne(){
+        return build("spawn.forced.error.more-than-one");
+    }
+
+
+    private Component textWithRemainingSecond(int remainingSecond, String key){
         return build(key,Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
     }
 
     public Component bar(int remainingSecond){
-        return timer(remainingSecond,"timer.bar");
+        return textWithRemainingSecond(remainingSecond,"timer.bar");
     }
-    public Component tchat(int remainingSecond){
-        return timer(remainingSecond,"timer.tchat");
+    public Component chat(int remainingSecond){
+        return textWithRemainingSecond(remainingSecond,"timer.chat");
     }
 
 

@@ -61,11 +61,12 @@ public class ConfigManager {
 
     private File ensureSpawn(){
         File file = new File(plugin.getDataFolder(),"spawnLocation.yml");
-        if (file.exists()){
-            file.mkdirs();
+        if (!file.exists()){
+            file.getParentFile().mkdirs();
             YamlConfiguration yamlConfiguration = new YamlConfiguration();
             yamlConfiguration.set("spawn-location",plugin.getServer().getRespawnWorld().getSpawnLocation());
             try {
+                file.createNewFile();
                 yamlConfiguration.save(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
