@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.text;
 
+import ch.wondercraft.wonderspawn.ConfigManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -89,6 +90,21 @@ public class Text {
 
     public Component setSpawnNeedsVerboseVersion(){
         return build("set-spawn.error.needs-verbose");
+    }
+
+    public Component reloadPromise(){
+        return build("reload.promise");
+    }
+
+    public Component reloadConfirmation(){
+        return build("reload.confirmation");
+    }
+
+    public Component reloadFailed(ConfigManager.ConfigException e){
+        return build("reload.error.bad",
+                Placeholder.unparsed("error-file",e.getFileName()),
+                Placeholder.unparsed("error-message",e.getMessage())
+                );
     }
 
 }

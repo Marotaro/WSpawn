@@ -27,7 +27,7 @@ public class TimerDisplay {
     private void apply(Data data){
         this.barColor = data.color();
         this.active = data.active();
-        this.isPerSecondUpdate = isPerSecondUpdate();
+        this.isPerSecondUpdate = data.isPerSecondUpdate();
         this.flags = data.flags;
     }
 

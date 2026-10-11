@@ -15,6 +15,11 @@ set-spawn:
   confirmation: "<prefix><green>New spawn Location correctly set, previous was (<old-x>,<old-y>,<old-z>)"
   error:
     needs-verbose-version: "<red>As Console you need to use verbose version"
+reload:
+  promise: "<prefix><green>Start reloading configs"
+  confirmation: "<prefix><green>Configs reloaded successfully"
+  error:
+    bad: "<red>Something bad happened (<error-message>) with <error-file> "
 
 timer:
   bar: "<red>Stay still for <white><remaining-second>s"

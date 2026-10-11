@@ -1,6 +1,7 @@
 package ch.wondercraft.wonderspawn;
 
 
+import ch.wondercraft.wonderspawn.commands.Reload;
 import ch.wondercraft.wonderspawn.commands.SetSpawn;
 import ch.wondercraft.wonderspawn.commands.Spawn;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationAction;
@@ -33,6 +34,7 @@ public class WSpawn extends JavaPlugin implements Listener {
             final Commands commands = event.registrar();
             commands.register(Spawn.create(configManager.text(),teleportationService).build());
             commands.register(SetSpawn.create(configManager.spawnLocation(),configManager.text()).build());
+            commands.register(Reload.create(configManager).build());
         });
     }
 

@@ -33,20 +33,22 @@ public class TeleportationService {
         CompletableFuture<TeleportationOutCome> future = teleportationAction.putPlayerTeleportation(player, canMove, waitTicks);
         if (waitTicks > 0) {
             soundNotification.INITIAL.play(player);
-            player.sendMessage(text.spawnPromise(waitTicks));
+            player.sendMessage(text.spawnPromise(waitTicks/20));
             BossBar bar = timerDisplay.isActive()? timerDisplay.create(waitTicks/20) : null;
             if (bar != null) player.showBossBar(bar);
             BukkitTask textUpdate = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
                 TeleportationAction.TeleportationInfo teleportationInfo = teleportationAction.getPlayerTeleportationInfo(player);
                 if (teleportationInfo != null) {
                     int remainingSecond = (int) Math.round((double) teleportationInfo.remainingTicks() / 20);
-                    if (bar != null) {
-                        bar.name(text.bar(remainingSecond));
+                    if (remainingSecond!=0) {
+                        if (bar != null) {
+                            bar.name(text.bar(remainingSecond));
+                        }
+                        player.sendMessage(text.chat(remainingSecond));
                     }
-                    player.sendMessage(text.chat(remainingSecond));
                 }
 
-            }, 0L, 20L);
+            }, 20L, 20L);
             BukkitTask barUpdate = Bukkit.getScheduler().runTaskTimer(plugin,()->{
                 TeleportationAction.TeleportationInfo teleportationInfo = teleportationAction.getPlayerTeleportationInfo(player);
                 if (teleportationInfo != null){
