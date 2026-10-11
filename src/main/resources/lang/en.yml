@@ -11,6 +11,10 @@ spawn:
     sender: "<green>You teleported <white><target> <green>to the spawn."
     error:
       more-than-one: "<red>You cannot force spawn more than one player at a time"
+set-spawn:
+  confirmation: "<prefix><green>New spawn Location correctly set, previous was (<old-x>,<old-y>,<old-z>)"
+  error:
+    needs-verbose-version: "<red>As Console you need to use verbose version"
 
 timer:
   bar: "<red>Stay still for <white><remaining-second>s"

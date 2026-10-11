@@ -15,6 +15,7 @@ public class TimerDisplay {
     private final Text text;
     private BossBar.Color barColor;
     private boolean active;
+    private boolean isPerSecondUpdate;
     private Set<BossBar.Flag> flags;
 
     private TimerDisplay(File configFile, Text text, Data data){
@@ -26,6 +27,7 @@ public class TimerDisplay {
     private void apply(Data data){
         this.barColor = data.color();
         this.active = data.active();
+        this.isPerSecondUpdate = isPerSecondUpdate();
         this.flags = data.flags;
     }
 
@@ -37,8 +39,9 @@ public class TimerDisplay {
 
         BossBar.Color color = BossBar.Color.valueOf(config.getString("timer-display.color","RED"));
         boolean active = config.getBoolean("timer-display.active");
+        boolean isPerSecondUpdate = config.getBoolean("timer-display.per-second-update");
         Set<BossBar.Flag> flags = config.getStringList("timer-display.flag").stream().map(BossBar.Flag::valueOf).collect(Collectors.toSet());
-        return new Data(color,active,flags);
+        return new Data(color,active,isPerSecondUpdate,flags);
     }
 
     public static TimerDisplay load(File configFile, Text text) throws NoSuchFileException,IllegalArgumentException{
@@ -57,5 +60,9 @@ public class TimerDisplay {
         return active;
     }
 
-    private record Data(BossBar.Color color, boolean active, Set<BossBar.Flag> flags){}
+    public boolean isPerSecondUpdate(){
+        return isPerSecondUpdate;
+    }
+
+    private record Data(BossBar.Color color, boolean active, boolean isPerSecondUpdate, Set<BossBar.Flag> flags){}
 }

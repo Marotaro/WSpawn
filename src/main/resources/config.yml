@@ -2,6 +2,7 @@ lang: "en"
 timer-display:
   color: "BLUE"
   active: true
+  per-tick-update: true
   flag:
     - DARKEN_SCREEN
     - PLAY_BOSS_MUSIC

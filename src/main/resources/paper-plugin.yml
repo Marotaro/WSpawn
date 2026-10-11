@@ -5,3 +5,11 @@ description: An somewhat customizable Spawn plugin
 api-version: '26.1.2'
 permissions:
   wspawn.spawn:
+    description: "self teleport to spawn"
+    default: true
+  wspawn.spawn.other:
+    description: "force teleport an other to spawn"
+    default: op
+  wspawn.set:
+    description: "set the new spawn of the server"
+    default: op

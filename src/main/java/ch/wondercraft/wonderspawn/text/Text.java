@@ -39,6 +39,10 @@ public class Text {
         }
     }
 
+    private Component textWithRemainingSecond(int remainingSecond, String key){
+        return build(key,Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
+    }
+
     public Component spawnPromise(int remainingSecond){
         return textWithRemainingSecond(remainingSecond,"spawn.self.promise");
     }
@@ -46,8 +50,6 @@ public class Text {
     public Component spawnConfirmation(){
         return build("spawn.self.confirmation");
     }
-
-
 
     public Component forcedSpawnNotice(CommandSender sender){
         return build("spawn.forced.target",
@@ -66,16 +68,27 @@ public class Text {
     }
 
 
-    private Component textWithRemainingSecond(int remainingSecond, String key){
-        return build(key,Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
-    }
-
     public Component bar(int remainingSecond){
         return textWithRemainingSecond(remainingSecond,"timer.bar");
     }
+
     public Component chat(int remainingSecond){
         return textWithRemainingSecond(remainingSecond,"timer.chat");
     }
 
+    public Component setSpawnConfirmation(Location oldLocation){
+        return build("set-spawn.confirmation",
+                Placeholder.unparsed("old-x",String.valueOf(Math.round(oldLocation.getX()))),
+                Placeholder.unparsed("old-y",String.valueOf(Math.round(oldLocation.getY()))),
+                Placeholder.unparsed("old-z",String.valueOf(Math.round(oldLocation.getZ()))),
+                Placeholder.unparsed("old-world",String.valueOf(oldLocation.getWorld())),
+                Placeholder.unparsed("old-yaw",String.valueOf(oldLocation.getYaw())),
+                Placeholder.unparsed("old-pitch",String.valueOf(oldLocation.getPitch()))
+                );
+    }
+
+    public Component setSpawnNeedsVerboseVersion(){
+        return build("set-spawn.error.needs-verbose");
+    }
 
 }
