@@ -1,17 +1,45 @@
+# ── Sounds ────────────────────────────────────
+# Sounds played during the teleport process.
+# They are only played to the player being teleported, not to nearby players.
+#
+# Each sound has:
+#   name:   Sound key (namespace:path). Vanilla sounds use "minecraft:",
+#           custom resource pack sounds use their own namespace
+#           (e.g. "wondercraft:spawn.teleport").
+#           If the sound doesn't exist, nothing is played for that type.
+#   volume: 1 = normal. Values above 1 make the sound audible from further away.
+#   pitch:  1 = normal. Minecraft accepts 0.5 (lowest) to 2.0 (highest).
+#
+# Using custom sounds from a resource pack:
+#   1. Create a resource pack with your .ogg files and a sounds.json that
+#      registers them under your namespace:
+#      https://minecraft.wiki/w/Sounds.json
+#      Resource pack structure: https://minecraft.wiki/w/Resource_pack
+#   2. Host the pack (zip) on a direct download link.
+#   3. Make players download it when they join, via server.properties:
+#      resource-pack=<direct url>
+#      resource-pack-sha1=<sha1 of the zip>
+#      require-resource-pack=true
+#      See: https://minecraft.wiki/w/Server.properties
+#   4. Use the sound key from your sounds.json as the "name" below.
 sounds:
+  # Played when the countdown starts.
   initial:
-    name: "minecraft:block.anvil.fall"
+    name: "minecraft:block.beacon.activate"
     volume: 1
-    pitch: 1
+    pitch: 1.5
+  # Played every second during the countdown.
   interval:
-    name: "minecraft:block.bamboo.fall"
+    name: "minecraft:block.note_block.pling"
     volume: 1
-    pitch: 1
+    pitch: 1.5
+  # Played when the player is teleported.
   final:
-    name: "minecraft:ancien_debris.fall"
+    name: "minecraft:entity.enderman.teleport"
     volume: 1
     pitch: 1
+  # Played when the teleport is cancelled (e.g. the player moved).
   error:
-    name: "minecraft:block.beehive.enter"
+    name: "minecraft:entity.villager.no"
     volume: 1
     pitch: 1
