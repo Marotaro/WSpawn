@@ -13,6 +13,7 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSele
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.Objects;
 
 public class Spawn {
@@ -26,6 +27,8 @@ public class Spawn {
                                 teleportationOutCome -> {
                                     if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS) {
                                         player.sendMessage(text.spawnConfirmation());
+                                    } else if (teleportationOutCome == TeleportationOutCome.MOVED) {
+                                        player.sendMessage(text.spawnPlayerMoved());
                                     }
                                 }
                         );
@@ -49,8 +52,10 @@ public class Spawn {
                                     Player player = res.getFirst();
                                     if (sender.equals(player))
                                         teleportationService.requestTeleportation(player,100,true).thenAccept( teleportationOutCome -> {
-                                                if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS)
-                                                    player.sendMessage(text.spawnConfirmation());
+                                                    if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS)
+                                                        player.sendMessage(text.spawnConfirmation());
+                                                    else if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.MOVED)
+                                                        player.sendMessage(text.spawnPlayerMoved());
                                                 }
                                         );
                                     else

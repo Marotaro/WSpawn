@@ -48,6 +48,10 @@ public class Text {
         return textWithRemainingSecond(remainingSecond,"spawn.self.promise");
     }
 
+    public Component spawnPlayerMoved(){
+        return build("spawn.self.error.moved");
+    }
+
     public Component spawnConfirmation(){
         return build("spawn.self.confirmation");
     }
