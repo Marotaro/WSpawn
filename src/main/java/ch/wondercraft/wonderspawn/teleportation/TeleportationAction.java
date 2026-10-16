@@ -16,8 +16,11 @@ public class TeleportationAction implements Runnable {
 
     public CompletableFuture<TeleportationOutCome> putPlayerTeleportation(Player player,boolean acceptMove, int waitTicks){
         CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
-        if (playersTeleportationInfo.contains(player)){
-            playersTeleportationInfo.get(player).outCome.complete(TeleportationOutCome.CANCELED);
+        System.out.println("test");
+        if (playersTeleportationInfo.containsKey(player)){
+            System.out.println("canceled");
+            CompletableFuture<TeleportationOutCome> outComeCompletableFuture = playersTeleportationInfo.get(player).outCome;
+            outComeCompletableFuture.complete(TeleportationOutCome.CANCELED);
         }
         playersTeleportationInfo.put(player,new TeleportationInfo(player.getLocation(),acceptMove,waitTicks,future));
         return future;
