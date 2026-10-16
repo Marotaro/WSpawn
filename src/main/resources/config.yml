@@ -1,4 +1,8 @@
 lang: "en"
+teleportation:
+  delay: 10 #in ticks
+  default-can-move: false
+  use-min: false
 timer-display:
   color: "BLUE"
   active: true

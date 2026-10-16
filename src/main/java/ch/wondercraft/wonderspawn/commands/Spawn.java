@@ -3,8 +3,8 @@ package ch.wondercraft.wonderspawn.commands;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
 import ch.wondercraft.wonderspawn.text.Text;
+import ch.wondercraft.wonderspawn.utils.PlayerTeleportationParameter;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -13,17 +13,16 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSele
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.Objects;
 
 public class Spawn {
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(Text text, TeleportationService teleportationService){
+    public static LiteralArgumentBuilder<CommandSourceStack> create(Text text, TeleportationService teleportationService, PlayerTeleportationParameter playerTeleportationParameter){
         return Commands.literal("spawn").requires(commandSourceStack ->commandSourceStack.getSender().hasPermission("wspawn.spawn"))
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (sender instanceof Player player){
-                        teleportationService.requestTeleportation(player,100,true).thenAccept(
+                        teleportationService.requestTeleportation(player, playerTeleportationParameter.getDelay(player),true).thenAccept(
                                 teleportationOutCome -> {
                                     if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS) {
                                         player.sendMessage(text.spawnConfirmation());
@@ -51,7 +50,7 @@ public class Spawn {
                                     }
                                     Player player = res.getFirst();
                                     if (sender.equals(player))
-                                        teleportationService.requestTeleportation(player,100,true).thenAccept( teleportationOutCome -> {
+                                        teleportationService.requestTeleportation(player, playerTeleportationParameter.getDelay(player),true).thenAccept(teleportationOutCome -> {
                                                     if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS)
                                                         player.sendMessage(text.spawnConfirmation());
                                                     else if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.MOVED)

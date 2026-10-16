@@ -13,3 +13,6 @@ permissions:
   wspawn.set:
     description: "set the new spawn of the server"
     default: op
+  wspawn.teleportation.delay.bypass:
+    description: "let player bypass waiting time"
+    default: op

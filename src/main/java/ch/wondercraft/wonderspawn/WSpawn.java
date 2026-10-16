@@ -32,7 +32,7 @@ public class WSpawn extends JavaPlugin implements Listener {
         this.teleportationService = new TeleportationService(this,configManager.spawnLocation(),configManager.sounds(),configManager.timerDisplay(),configManager.text());
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
-            commands.register(Spawn.create(configManager.text(),teleportationService).build());
+            commands.register(Spawn.create(configManager.text(),teleportationService,configManager.playerWaitTime()).build());
             commands.register(SetSpawn.create(configManager.spawnLocation(),configManager.text()).build());
             commands.register(Reload.create(configManager).build());
         });
