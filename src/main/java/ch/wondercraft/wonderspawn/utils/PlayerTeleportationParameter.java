@@ -49,10 +49,9 @@ public class PlayerTeleportationParameter {
 
             String perm = info.getPermission().toLowerCase();
             if (!perm.startsWith(prefix)) continue;
-
             try {
                 int value = Integer.parseInt(perm.substring(prefix.length()));
-                if (best == -1 || (this.useMin)? (value<best): (value > best)) best = value;
+                if (best == -1 || (this.useMin ? value < best : value > best)) best = value;
             } catch (NumberFormatException ignored) {}
         }
         return (best==-1)? defaultTime : best;

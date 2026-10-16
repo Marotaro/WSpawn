@@ -1,7 +1,7 @@
 name: WSpawn
-version: '0.0.0-SNAPSHOT'
+version: '0.0.1'
 main: ch.wondercraft.wonderspawn.WSpawn
-description: An somewhat customizable Spawn plugin
+description: A somewhat customizable Spawn plugin
 api-version: '26.1.2'
 permissions:
   wspawn.spawn:
@@ -15,4 +15,10 @@ permissions:
     default: op
   wspawn.teleportation.delay.bypass:
     description: "let player bypass waiting time"
+    default: op
+  wspawn.reload:
+    description: "let player reload plugin config"
+    default: op
+  wspawn.teleportation.move:
+    description: "let player move when waiting"
     default: op

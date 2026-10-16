@@ -22,7 +22,7 @@ public class Spawn {
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (sender instanceof Player player){
-                        teleportationService.requestTeleportation(player, playerTeleportationParameter.getDelay(player),true).thenAccept(
+                        teleportationService.requestTeleportation(player, playerTeleportationParameter.getDelay(player), playerTeleportationParameter.getMovePossible(player)).thenAccept(
                                 teleportationOutCome -> {
                                     if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS) {
                                         player.sendMessage(text.spawnConfirmation());
