@@ -84,6 +84,7 @@ public class ConfigManager {
 
         SoundNotification newSounds;
         TextString newTextString;
+        Text newText;
         TimerDisplay newTimer;
         SpawnLocation newSpawnLocation;
         PlayerTeleportationParameter newPlayerTeleportationParameter;
@@ -101,10 +102,12 @@ public class ConfigManager {
         this.spawnLocation = newSpawnLocation;
         try {
             newTextString =TextString.load(lang);
-            text = new Text(spawnLocation,newTextString);
+            newText = new Text(spawnLocation,newTextString);
         } catch (NoSuchFileException | IllegalArgumentException e){
             throw new ConfigException("lang/---.yml", e.getMessage(), e);
         }
+            this.textString = newTextString;
+            this.text=newText;
         try {
             newTimer = TimerDisplay.load(config,text);
         } catch (NoSuchFileException | IllegalArgumentException e){
@@ -121,7 +124,7 @@ public class ConfigManager {
 
     public void reload() throws ConfigException{
         File config = ensure("config.yml");
-        ensure("lang/"+YamlConfiguration.loadConfiguration(config).getString("lang")+".yml","lang/en.yml");
+        File langFile = ensure("lang/"+YamlConfiguration.loadConfiguration(config).getString("lang")+".yml","lang/en.yml");
         ensure("sounds.yml");
         ensureSpawn();
 
@@ -143,6 +146,11 @@ public class ConfigManager {
         try {
             playerTeleportationParameter.reload();
         } catch (NoSuchFileException | IllegalArgumentException e){
+            throw new ConfigException("config.yml", e.getMessage(), e);
+        }
+        try {
+            textString.reload(langFile);
+        } catch (IllegalArgumentException e){
             throw new ConfigException("config.yml", e.getMessage(), e);
         }
     }

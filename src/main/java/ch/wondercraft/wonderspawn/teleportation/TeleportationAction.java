@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -16,11 +17,9 @@ public class TeleportationAction implements Runnable {
 
     public CompletableFuture<TeleportationOutCome> putPlayerTeleportation(Player player,boolean acceptMove, int waitTicks){
         CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
-        System.out.println("test");
-        if (playersTeleportationInfo.containsKey(player)){
-            System.out.println("canceled");
-            CompletableFuture<TeleportationOutCome> outComeCompletableFuture = playersTeleportationInfo.get(player).outCome;
-            outComeCompletableFuture.complete(TeleportationOutCome.CANCELED);
+        if (hasAlreadyRequested(player)){
+            playersTeleportationInfo.get(player).reset(player.getLocation(),acceptMove,waitTicks,future);
+            return future;
         }
         playersTeleportationInfo.put(player,new TeleportationInfo(player.getLocation(),acceptMove,waitTicks,future));
         return future;
@@ -50,7 +49,7 @@ public class TeleportationAction implements Runnable {
                     }
                     playersTeleportationInfo.remove(player);
                 }
-                teleportationInfo.update();
+                teleportationInfo.updateTimer();
             });
         }
     }
@@ -59,9 +58,13 @@ public class TeleportationAction implements Runnable {
         return playersTeleportationInfo.get(player);
     }
 
+    public boolean hasAlreadyRequested(Player player){
+        return playersTeleportationInfo.containsKey(player);
+    }
+
     public class TeleportationInfo{
-        private final Location playerLocation;
-        private final boolean acceptMove;
+        private Location playerLocation;
+        private boolean acceptMove;
         private int baseTicks;
         private int elapsedTicks;
         private CompletableFuture<TeleportationOutCome> outCome;
@@ -73,7 +76,16 @@ public class TeleportationAction implements Runnable {
             this.outCome = outCome;
         }
 
-        private void update(){
+        private void reset(Location playerLocation, boolean acceptMove, int baseTicks, CompletableFuture<TeleportationOutCome> outCome){
+            this.playerLocation = playerLocation;
+            this.acceptMove = acceptMove;
+            this.baseTicks = baseTicks;
+            this.elapsedTicks = 0;
+            this.outCome.complete(TeleportationOutCome.CANCELED);
+            this.outCome = outCome;
+        }
+
+        private void updateTimer(){
             elapsedTicks+=1;
         }
 
