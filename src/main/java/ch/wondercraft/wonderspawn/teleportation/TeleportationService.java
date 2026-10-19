@@ -26,7 +26,7 @@ public class TeleportationService {
         this.soundNotification = soundNotification;
         this.timerDisplay = timerDisplay;
         this.text = text;
-        Bukkit.getScheduler().runTaskTimer(plugin,teleportationAction,1L,1L);
+        Bukkit.getScheduler().runTaskTimer(plugin,teleportationAction,0L,1L);
     }
 
     public CompletableFuture<TeleportationOutCome> requestTeleportation(Player player, int waitTicks, boolean canMove){
@@ -64,7 +64,10 @@ public class TeleportationService {
                             soundNotification.FINAL.play(player);
                             teleportationInfo.getTimer().hide();
                         }
-                        case MOVED, CANCELED, ERROR -> soundNotification.ERROR.play(player);
+                        case MOVED, ERROR -> {
+                            soundNotification.ERROR.play(player);
+                            teleportationInfo.getTimer().hide();
+                        }
                     }
                 });
             });
