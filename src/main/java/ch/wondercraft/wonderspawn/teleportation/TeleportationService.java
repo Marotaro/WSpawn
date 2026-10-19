@@ -22,7 +22,7 @@ public class TeleportationService {
                                 SoundNotification soundNotification, TimerDisplay timerDisplay,
                                 Text text){
         this.plugin = plugin;
-        this.teleportationAction = new TeleportationAction(spawnLocation);
+        this.teleportationAction = new TeleportationAction(spawnLocation, timerDisplay);
         this.soundNotification = soundNotification;
         this.timerDisplay = timerDisplay;
         this.text = text;
@@ -34,28 +34,21 @@ public class TeleportationService {
         if (waitTicks > 0) {
             soundNotification.INITIAL.play(player);
             player.sendMessage(text.spawnPromise(waitTicks/20));
-            BossBar bar = timerDisplay.isActive()? timerDisplay.create(waitTicks/20) : null;
-            if (bar != null) player.showBossBar(bar);
+            TeleportationAction.TeleportationInfo teleportationInfo = teleportationAction.getPlayerTeleportationInfo(player);
+            if (timerDisplay.isActive())
+                teleportationInfo.getTimer().show();
             BukkitTask textUpdate = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                TeleportationAction.TeleportationInfo teleportationInfo = teleportationAction.getPlayerTeleportationInfo(player);
                 if (teleportationInfo != null) {
                     int remainingSecond = (int) Math.round((double) teleportationInfo.remainingTicks() / 20);
                     if (remainingSecond!=0) {
-                        if (bar != null) {
-                            bar.name(text.bar(remainingSecond));
-                        }
+                        teleportationInfo.getTimer().updateBarName(text.bar(remainingSecond));
                         player.sendMessage(text.chat(remainingSecond));
                     }
                 }
 
             }, 20L, 20L);
             BukkitTask barUpdate = Bukkit.getScheduler().runTaskTimer(plugin,()->{
-                TeleportationAction.TeleportationInfo teleportationInfo = teleportationAction.getPlayerTeleportationInfo(player);
-                if (teleportationInfo != null){
-                    if (bar != null){
-                        bar.progress(Math.max(0f, (float) teleportationInfo.remainingTicks() / teleportationInfo.getBaseTicks()));
-                    }
-                }
+                teleportationInfo.getTimer().updateBarProgress((float) teleportationInfo.remainingTicks() / teleportationInfo.getBaseTicks());
             }, 0L, timerDisplay.isPerSecondUpdate()? 20L:1L);
             BukkitTask soundsInterval = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
                 if (teleportationAction.getPlayerTeleportationInfo(player).remainingTicks() > 5)
@@ -66,9 +59,11 @@ public class TeleportationService {
                     textUpdate.cancel();
                     barUpdate.cancel();
                     soundsInterval.cancel();
-                    if (bar != null) player.hideBossBar(bar);
                     switch (teleportationOutCome){
-                        case SUCCESS -> soundNotification.FINAL.play(player);
+                        case SUCCESS -> {
+                            soundNotification.FINAL.play(player);
+                            teleportationInfo.getTimer().hide();
+                        }
                         case MOVED, CANCELED, ERROR -> soundNotification.ERROR.play(player);
                     }
                 });

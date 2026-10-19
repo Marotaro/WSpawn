@@ -1,6 +1,7 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -10,9 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TeleportationAction implements Runnable {
     private final ConcurrentHashMap<Player,TeleportationInfo> playersTeleportationInfo = new ConcurrentHashMap<>();
     private final Location spawnLocation;
+    private final TimerDisplay timerDisplay;
 
-    public TeleportationAction(Location spawnLocation){
+    public TeleportationAction(Location spawnLocation, TimerDisplay timerDisplay){
         this.spawnLocation = spawnLocation;
+        this.timerDisplay = timerDisplay;
     }
 
     public CompletableFuture<TeleportationOutCome> putPlayerTeleportation(Player player,boolean acceptMove, int waitTicks){
@@ -21,7 +24,7 @@ public class TeleportationAction implements Runnable {
             playersTeleportationInfo.get(player).reset(player.getLocation(),acceptMove,waitTicks,future);
             return future;
         }
-        playersTeleportationInfo.put(player,new TeleportationInfo(player.getLocation(),acceptMove,waitTicks,future));
+        playersTeleportationInfo.put(player,new TeleportationInfo(player,acceptMove,waitTicks,future));
         return future;
     }
 
@@ -67,13 +70,15 @@ public class TeleportationAction implements Runnable {
         private boolean acceptMove;
         private int baseTicks;
         private int elapsedTicks;
+        private Bar timer;
         private CompletableFuture<TeleportationOutCome> outCome;
 
-        private TeleportationInfo(Location playerLocation,boolean acceptMove, int baseTicks, CompletableFuture<TeleportationOutCome> outCome){
-            this.playerLocation = playerLocation;
+        private TeleportationInfo(Player player,boolean acceptMove, int baseTicks, CompletableFuture<TeleportationOutCome> outCome){
+            this.playerLocation = player.getLocation();
             this.acceptMove = acceptMove;
             this.baseTicks = baseTicks;
             this.outCome = outCome;
+            this.timer = new Bar(player);
         }
 
         private void reset(Location playerLocation, boolean acceptMove, int baseTicks, CompletableFuture<TeleportationOutCome> outCome){
@@ -81,6 +86,8 @@ public class TeleportationAction implements Runnable {
             this.acceptMove = acceptMove;
             this.baseTicks = baseTicks;
             this.elapsedTicks = 0;
+            timer.hide();
+            timer = new Bar(timer.player);
             this.outCome.complete(TeleportationOutCome.CANCELED);
             this.outCome = outCome;
         }
@@ -95,6 +102,34 @@ public class TeleportationAction implements Runnable {
 
         public int getBaseTicks(){
             return baseTicks;
+        }
+
+        public Bar getTimer() {return timer;}
+
+        public class Bar{
+            private final Player player;
+            private final BossBar bossBar;
+
+            private Bar(Player player){
+                this.player = player;
+                this.bossBar = timerDisplay.create(baseTicks/20);
+            }
+
+            public void hide(){
+                player.hideBossBar(bossBar);
+            }
+
+            public void show(){
+                player.showBossBar(bossBar);
+            }
+
+            public void updateBarName(Component name){
+                bossBar.name(name);
+            }
+
+            public void updateBarProgress(float progress){
+                bossBar.progress(Math.max(0f,progress));
+            }
         }
     }
 }

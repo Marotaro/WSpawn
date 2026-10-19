@@ -27,7 +27,7 @@ public class WSpawn extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        this.teleportationAction = new TeleportationAction(configManager.spawnLocation());
+        this.teleportationAction = new TeleportationAction(configManager.spawnLocation(),configManager.timerDisplay());
         Bukkit.getScheduler().runTaskTimer(this,teleportationAction,0L,1L);
         this.teleportationService = new TeleportationService(this,configManager.spawnLocation(),configManager.sounds(),configManager.timerDisplay(),configManager.text());
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
