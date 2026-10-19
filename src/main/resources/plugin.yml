@@ -6,6 +6,6 @@ author: LoanM
 website: https://wondercraft.ch
 api-version: '26.1.2'
 permissions:
-  wonderspawn.spawn:
-    description: "Autorise l'utilisation du spawn"
+  wspawn.spawn:
+    description: "Autorise l'utilisation du Spawn"
     default: true

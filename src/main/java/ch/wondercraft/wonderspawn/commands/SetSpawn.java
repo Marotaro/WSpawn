@@ -1,58 +1,56 @@
 package ch.wondercraft.wonderspawn.commands;
 
-import ch.wondercraft.wonderspawn.LocationFiler;
-import ch.wondercraft.wonderspawn.message.MessagesHandler;
+import ch.wondercraft.wonderspawn.SpawnLocation;
+import ch.wondercraft.wonderspawn.text.Text;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.FinePositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.RotationResolver;
-import io.papermc.paper.math.FinePosition;
-import io.papermc.paper.math.Rotation;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 public class SetSpawn {
-    public static LiteralArgumentBuilder<CommandSourceStack> create(LocationFiler locationFiler, MessagesHandler messagesHandler){
-        return Commands.literal("setspawn").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.set"))
+    public static LiteralArgumentBuilder<CommandSourceStack> create(SpawnLocation spawnLocation, Text text){
+        return Commands.literal("setspawn").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.setspawn"))
                 .executes(context -> {
-                    CommandSourceStack source = context.getSource();
-                    CommandSender sender = source.getSender();
-                    Entity executor = source.getExecutor();
-                    if (executor == null){
-                        //todo change to custom message with message file
-                        sender.sendMessage("need an executor");
-                        return Command.SINGLE_SUCCESS;
+                    CommandSender commandSender = context.getSource().getSender();
+                    if (commandSender instanceof Player player){
+                        Location oldLocation = spawnLocation.clone();
+                        spawnLocation.update(player.getLocation());
+                        player.sendMessage(text.setSpawnConfirmation(oldLocation));
+                    } else {
+                        commandSender.sendMessage(text.setSpawnNeedsVerboseVersion());
                     }
-                    locationFiler.setSpawnPoint(executor.getLocation());
-                    sender.sendMessage(messagesHandler.setSpawn(executor.getLocation()));
                     return Command.SINGLE_SUCCESS;
-                })
-                .then(
-                        Commands.argument("worldName", ArgumentTypes.world()).then(
+                }).then(
+                        Commands.argument("world", ArgumentTypes.world()).then(
                                 Commands.argument("position",ArgumentTypes.finePosition()).then(
                                         Commands.argument("rotation",ArgumentTypes.rotation()).executes(context -> {
-                                            CommandSourceStack source = context.getSource();
-                                            CommandSender sender = source.getSender();
-                                            Entity executor = source.getExecutor();
-                                            World world = context.getArgument("worldName", World.class);
-                                            FinePositionResolver finePositionResolver = context.getArgument("position", FinePositionResolver.class);
-                                            FinePosition finePosition = finePositionResolver.resolve(source);
-                                            Location location = finePosition.toLocation(world);
+                                            CommandSender commandSender = context.getSource().getSender();
+                                            FinePositionResolver positionResolver = context.getArgument("position", FinePositionResolver.class);
+                                            var finePosition = positionResolver.resolve(context.getSource());
                                             RotationResolver rotationResolver = context.getArgument("rotation", RotationResolver.class);
-                                            location.setRotation(rotationResolver.resolve(source));
-                                            locationFiler.setSpawnPoint(location);
-                                            sender.sendMessage(messagesHandler.setSpawn(location));
+                                            var rotation = rotationResolver.resolve(context.getSource());
+                                            Location newLocation = new Location(
+                                                    context.getArgument("world", World.class),
+                                                    finePosition.x(),
+                                                    finePosition.y(),
+                                                    finePosition.z(),
+                                                    rotation.yaw(),
+                                                    rotation.pitch()
+                                                    );
+                                            Location oldLocation = spawnLocation.clone();
+                                            spawnLocation.update(newLocation);
+                                            commandSender.sendMessage(text.setSpawnConfirmation(oldLocation));
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 )
                         )
-                )
-                ;
+                );
     }
 }

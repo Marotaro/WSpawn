@@ -1,28 +1,28 @@
+# Plugin language file to use (e.g. "en")
+lang: "en"
+
 teleportation:
-  delay: 15
-  can-move: false
-  fog: true
-  initial-sound:
-    active: true
-    name: "minecraft:block.note_block.bell"
-    volume: 1
-    pitch: 1
-  per-second-sound:
-    active: true
-    name: "minecraft:block.glass.break"
-    volume: 1
-    pitch: 1
-  final-sound:
-    active: true
-    name: "minecraft:block.amethyst_block.break"
-    volume: 1
-    pitch: 1
-  moved-sound:
-    active: true
-    name: "minecraft:block.note_block.bass"
-    volume: 1
-    pitch: 0.5
-  timer-display:
-    active: true
-    text: "<dark_purple>✦</dark_purple> <light_purple>Téléportation dans</light_purple> <yellow><bold><time>s</bold></yellow> <dark_purple>✦</dark_purple>"
-    color: "PURPLE"
+  # Default countdown before the teleport, in ticks (20 ticks = 1 second, so 100 = 5 s)
+  # Used when the player has no wspawn.teleportation.delay.<ticks> permission
+  # Players with wspawn.teleportation.delay.bypass skip the countdown entirely
+  delay: 100
+  # Whether players may move during the countdown
+  # (wspawn.teleportation.move allows it regardless of this value)
+  default-can-move: false
+  # If a player has several wspawn.teleportation.delay.<ticks> permissions:
+  # true = use the smallest delay, false = use the biggest one
+  use-min: false
+
+# Boss bar showing the countdown
+timer-display:
+  # Bar color (Adventure BossBar.Color: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE)
+  color: "BLUE"
+  # Enable or disable the boss bar
+  active: true
+  # Update the displayed time every second instead of every tick
+  per-second-update: true
+  # Boss bar flags (Adventure BossBar.Flag), remove any you don't want
+  flag:
+    - DARKEN_SCREEN      # darkens the sky
+    - PLAY_BOSS_MUSIC    # plays boss music
+    - CREATE_WORLD_FOG   # adds fog

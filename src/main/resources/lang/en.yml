@@ -1,25 +1,78 @@
-##global variables:
-# spawn_x - x coordonate of the spawn
-# spawn_y - y coordonate of the spawn
-# spawn_z - z coodonate of the spawn
-# spawn_world - name of the world
+# ──────────────────────────────────────────────
+# WSpawn - messages configuration
+# Format: MiniMessage (https://docs.advntr.dev/minimessage/format.html)
+#
+# The language file used by the plugin is selected in the general config file (config.yml).
+# To use another language, change the lang option there, then run /wspawn reload.
+#
+# Only one language can be active at a time for the whole server (there is no per-player language).
+# To create your own language, copy this file with all its entries, translate the values
+# (keep the keys and the <placeholders> unchanged), then select it in config.yml.
+#
+# Global placeholders (usable in every message):
+#   <spawn-x> <spawn-y> <spawn-z>   Spawn coordinates
+#   <spawn-world>                   Spawn world name
+#   <spawn-yaw> <spawn-pitch>       Spawn rotation
+#   <prefix>                        The prefix defined below
+#
+# <sender> and <target> are a player name or "Console".
+# ──────────────────────────────────────────────
 
-prefix: "<gray>[<aqua>WSpawn<gray>]"
+# Prefix prepended to most chat messages (gradient + dark gray brackets).
+prefix: "<dark_gray>[<gradient:#55ffff:#5555ff>WSpawn</gradient><dark_gray>] <gray>"
+
+# ── /spawn ────────────────────────────────────
 spawn:
-  self: "<green>You have been teleported to the spawn <gray>(<white><spawn_x><gray>, <white><spawn_y><gray>, <white><spawn_z><gray>)"
-  other:
-    # target is the teleported player
-    commander:
-      single: "<green>You teleported <yellow><target> <green>to the spawn"
-      all: "<green>You teleported <yellow><number> <green>players to the spawn"
-    # commander might be a player or the console
-    target: "<green>You have been teleported by <yellow><commander>"
-  errors:
-    teleportation: "<red>There has been an errorTeleportation while teleporting"
-    executor:
-      null: "You cannot use spawn commands without an executor"
-      not_a_player: "Executor needs to be a player"
-  moved: "<red>You moved, teleportation canceled!</red>"
-set:
-  spawn: "<location_x>,<location_y>,<location_z>,<location_world>,<location_yaw>,<location_pitch>"
-  error: "needs an executor"
+  # A player teleports themselves to the spawn.
+  self:
+    # Sent when the countdown starts.
+    # Placeholders: <remaining-second>
+    promise: "<prefix><green>You will be teleported to the spawn in <white><remaining-second><green>s."
+    # Sent after the teleport succeeded.
+    confirmation: "<prefix><green>You were teleported to the spawn <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>."
+    error:
+      # Sent when the player moves during the countdown (teleport cancelled).
+      moved: "<prefix><red>You moved, please try again."
+
+  # A player or the console forces another player to the spawn.
+  forced:
+    # Message received by the teleported player.
+    # Placeholders: <sender>
+    target: "<prefix><green>You were teleported to the spawn by <white><sender><green>."
+    # Message received by whoever ran the command.
+    # Placeholders: <target>
+    sender: "<prefix><green>You teleported <white><target> <green>to the spawn."
+    error:
+      # Sent when the command targets several players (e.g. @a or a selector).
+      more-than-one: "<prefix><red>You cannot force-teleport more than one player at a time."
+
+# ── /setspawn ─────────────────────────────────
+set-spawn:
+  # Sent after the spawn is changed.
+  # <spawn-*> = the NEW location, <old-*> = the previous one.
+  # Placeholders: <old-x> <old-y> <old-z> <old-world> <old-yaw> <old-pitch>
+  confirmation: "<prefix><green>The spawn location was set successfully <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>. Previous location: <dark_gray>(<yellow><old-x><gray>, <yellow><old-y><gray>, <yellow><old-z><dark_gray>)<green>."
+  error:
+    # Sent when the console runs the command without explicit coordinates.
+    needs-verbose-version: "<prefix><red>As the console, you need to use the verbose version of this command."
+
+# ── /wspawn reload ────────────────────────────
+reload:
+  # Sent when the reload starts.
+  promise: "<prefix><green>Reloading configs..."
+  # Sent when the reload finished without errors.
+  confirmation: "<prefix><green>Configs reloaded successfully."
+  error:
+    # Sent when a config file fails to load.
+    # Placeholders: <error-file> <error-message>
+    bad: "<prefix><red>Something went wrong while reloading <white><error-file><red>: <white><error-message><red>."
+
+# ── Countdown display ─────────────────────────
+# Shown while the player must stand still before being teleported.
+# Placeholders: <remaining-second>
+timer:
+  # Boss bar title (no prefix, to keep it short).
+  bar: "<red>Stay still for <white><remaining-second><red>s"
+  # Chat display.
+  # Placeholder: <remaining-second>
+  chat: "<prefix><red>Stay still for <white><remaining-second><red>s."
