@@ -1,6 +1,5 @@
 package ch.wondercraft.wonderspawn.commands;
 
-import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
 import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.utils.PlayerTeleportationParameter;
@@ -15,6 +14,8 @@ import org.bukkit.entity.Player;
 
 import java.util.Objects;
 
+//TODO put text output inside request to remove problem with text order
+
 public class Spawn {
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(Text text, TeleportationService teleportationService, PlayerTeleportationParameter playerTeleportationParameter){
@@ -22,51 +23,11 @@ public class Spawn {
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (sender instanceof Player player){
-                        teleportationService.requestTeleportation(player, playerTeleportationParameter.getDelay(player), playerTeleportationParameter.getMovePossible(player)).thenAccept(
-                                teleportationOutCome -> {
-                                    if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS) {
-                                        player.sendMessage(text.spawnConfirmation());
-                                    } else if (teleportationOutCome == TeleportationOutCome.MOVED) {
-                                        player.sendMessage(text.spawnPlayerMoved());
-                                    }
-                                }
-                        );
+                        teleportationService.request(player);
                         return Command.SINGLE_SUCCESS;
                     }
                     sender.sendMessage("need to be a player");
                     return Command.SINGLE_SUCCESS;
-                })
-                .then(
-                        Commands.argument("player", ArgumentTypes.player()).requires(
-                                commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.spawn.other")
-                        ).executes(
-                                context -> {
-                                    CommandSender sender = context.getSource().getSender();
-                                    PlayerSelectorArgumentResolver resolver = context.getArgument("player", PlayerSelectorArgumentResolver.class);
-                                    var res = resolver.resolve(context.getSource());
-                                    if (res.size()!=1){
-                                        sender.sendMessage(text.forcedSpawnTryMoreThanOne());
-                                        return Command.SINGLE_SUCCESS;
-                                    }
-                                    Player player = res.getFirst();
-                                    if (sender.equals(player))
-                                        teleportationService.requestTeleportation(player, playerTeleportationParameter.getDelay(player),true).thenAccept(teleportationOutCome -> {
-                                                    if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.SUCCESS)
-                                                        player.sendMessage(text.spawnConfirmation());
-                                                    else if (Objects.requireNonNull(teleportationOutCome) == TeleportationOutCome.MOVED)
-                                                        player.sendMessage(text.spawnPlayerMoved());
-                                                }
-                                        );
-                                    else
-                                        teleportationService.requestTeleportation(player,0,true).thenAccept(teleportationOutCome -> {
-                                            if (Objects.requireNonNull(teleportationOutCome)== TeleportationOutCome.SUCCESS){
-                                                player.sendMessage(text.forcedSpawnNotice(sender));
-                                                sender.sendMessage(text.forcedSpawnConfirmation(player));
-                                            }
-                                        });
-                                    return Command.SINGLE_SUCCESS;
-                                }
-                        )
-                );
+                });
     }
 }

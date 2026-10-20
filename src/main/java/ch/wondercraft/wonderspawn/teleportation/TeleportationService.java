@@ -1,84 +1,78 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
-import ch.wondercraft.wonderspawn.teleportation.sounds.SoundNotification;
 import ch.wondercraft.wonderspawn.text.Text;
-import net.kyori.adventure.bossbar.BossBar;
-import org.bukkit.Bukkit;
+import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
 
 public class TeleportationService {
-    private final Plugin plugin;
-    private final TeleportationAction teleportationAction;
-    private final SoundNotification soundNotification;
-    private final TimerDisplay timerDisplay;
-    private final Text text;
+    private static enum REASON {COMMAND_SELF,EVENT}
+    private Location spawnLocation;
+    private Text text;
+    private Plugin plugin;
+    private TeleportationQueue teleportationQueue;
+    private int defaultWaitTicks;
+    private boolean defaultCanMove;
 
-    public TeleportationService(Plugin plugin, Location spawnLocation,
-                                SoundNotification soundNotification, TimerDisplay timerDisplay,
-                                Text text){
+    public TeleportationService(Plugin plugin, Text text, Location spawnLocation, TeleportationQueue teleportationQueue){
         this.plugin = plugin;
-        this.teleportationAction = new TeleportationAction(spawnLocation, timerDisplay);
-        this.soundNotification = soundNotification;
-        this.timerDisplay = timerDisplay;
+        ConfigChecker.warnIfMissing(plugin,"teleportation.default-tick-delay");
+        this.defaultWaitTicks = plugin.getConfig().getInt("teleportation.default-tick-delay");
+        ConfigChecker.warnIfMissing(plugin,"teleportation.default-can-move");
+        this.defaultCanMove = plugin.getConfig().getBoolean("teleportation.default-can-move");
         this.text = text;
-        Bukkit.getScheduler().runTaskTimer(plugin,teleportationAction,0L,1L);
+        this.spawnLocation = spawnLocation;
+        this.teleportationQueue = teleportationQueue;
     }
 
-    public CompletableFuture<TeleportationOutCome> requestTeleportation(Player player, int waitTicks, boolean canMove){
-        CompletableFuture<TeleportationOutCome> future = teleportationAction.putPlayerTeleportation(player, canMove, waitTicks);
-        if (waitTicks > 0) {
-            soundNotification.INITIAL.play(player);
-            player.sendMessage(text.spawnPromise(waitTicks/20));
-            TeleportationAction.TeleportationInfo teleportationInfo = teleportationAction.getPlayerTeleportationInfo(player);
-            if (timerDisplay.isActive())
-                teleportationInfo.getTimer().show();
-            BukkitTask textUpdate = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                if (teleportationInfo != null) {
-                    int remainingSecond = (int) Math.round((double) teleportationInfo.remainingTicks() / 20);
-                    if (remainingSecond!=0) {
-                        teleportationInfo.getTimer().updateBarName(text.bar(remainingSecond));
-                        player.sendMessage(text.chat(remainingSecond));
-                    }
-                }
+    public void reload(){
+        ConfigChecker.warnIfMissing(plugin,"teleportation.default-tick-delay");
+        this.defaultWaitTicks = plugin.getConfig().getInt("teleportation.default-tick-delay");
+        ConfigChecker.warnIfMissing(plugin,"teleportation.default-can-move");
+        this.defaultCanMove = plugin.getConfig().getBoolean("teleportation.default-can-move");
+    }
 
-            }, 20L, 20L);
-            BukkitTask barUpdate = Bukkit.getScheduler().runTaskTimer(plugin,()->{
-                teleportationInfo.getTimer().updateBarProgress((float) teleportationInfo.remainingTicks() / teleportationInfo.getBaseTicks());
-            }, 0L, timerDisplay.isPerSecondUpdate()? 20L:1L);
-            BukkitTask soundsInterval = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                if (teleportationAction.getPlayerTeleportationInfo(player).remainingTicks() > 5)
-                    soundNotification.INTERVAL.play(player);
-            }, 20L, 20L);
-            future.thenAccept(teleportationOutCome -> {
-                Bukkit.getScheduler().runTask(plugin,()->{
-                    textUpdate.cancel();
-                    barUpdate.cancel();
-                    soundsInterval.cancel();
-                    switch (teleportationOutCome){
-                        case SUCCESS -> {
-                            soundNotification.FINAL.play(player);
-                            teleportationInfo.getTimer().hide();
-                        }
-                        case MOVED, ERROR -> {
-                            soundNotification.ERROR.play(player);
-                            teleportationInfo.getTimer().hide();
-                        }
+    public CompletableFuture<Boolean> request(Player player){
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        player.teleportAsync(spawnLocation).thenAccept(b->{
+            if (b){
+                player.sendMessage(text.spawnConfirmation());
+                future.complete(true);
+            } else {
+                //todo change that
+                player.sendMessage("bof");
+                future.complete(false);
+            }
+        });
+        return future;
+    }
+
+    public CompletableFuture<Boolean> request(Player player, int waitTicks, boolean canMove){
+        if (waitTicks == 0){
+            return request(player);
+        }
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        teleportationQueue.add(player,waitTicks,canMove).thenAccept(waitOutCome -> {
+            if (waitOutCome== TeleportationQueue.WaitInfo.WaitOutCome.SUCCESS){
+                player.teleportAsync(spawnLocation).thenAccept(b ->{
+                    if (b){
+                        player.sendMessage(text.spawnConfirmation());
+                        future.complete(true);
+                    } else {
+                        player.sendMessage("bof");
+                        future.complete(false);
                     }
                 });
-            });
-        } else
-            future.thenAccept(teleportationOutCome -> {
-               switch (teleportationOutCome){
-                   case SUCCESS -> soundNotification.FINAL.play(player);
-                   case MOVED, CANCELED, ERROR -> soundNotification.ERROR.play(player);
-               }
-            });
-
+            } else if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.MOVED) {
+                player.sendMessage(text.spawnPlayerMoved());
+            }
+            if (waitOutCome != TeleportationQueue.WaitInfo.WaitOutCome.SUCCESS)
+                future.complete(false);
+        });
         return future;
     }
 }

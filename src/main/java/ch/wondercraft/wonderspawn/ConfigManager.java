@@ -1,7 +1,6 @@
 package ch.wondercraft.wonderspawn;
 
-import ch.wondercraft.wonderspawn.teleportation.TimerDisplay;
-import ch.wondercraft.wonderspawn.teleportation.sounds.SoundNotification;
+import ch.wondercraft.wonderspawn.teleportation.TeleportationSound;
 import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.text.TextString;
 import ch.wondercraft.wonderspawn.utils.PlayerTeleportationParameter;
@@ -24,15 +23,15 @@ public class ConfigManager {
     }
 
     private final Plugin plugin;
-    private SoundNotification sounds;
+    private TeleportationSound sounds;
     private TextString textString;
     private Text text;
-    private TimerDisplay timerDisplay;
     private SpawnLocation spawnLocation;
     private PlayerTeleportationParameter playerTeleportationParameter;
 
     public ConfigManager(Plugin plugin){
         this.plugin = plugin;
+        this.sounds = TeleportationSound.load(plugin);
     }
 
     private File ensure(String name) throws ConfigException{
@@ -79,21 +78,12 @@ public class ConfigManager {
     public void load() throws ConfigException {
         File config = ensure("config.yml");
         File lang = ensure("lang/"+YamlConfiguration.loadConfiguration(config).getString("lang")+".yml","lang/en.yml");
-        File soundsFile = ensure("sounds.yml");
         File spawnFile = ensureSpawn();
 
-        SoundNotification newSounds;
         TextString newTextString;
         Text newText;
-        TimerDisplay newTimer;
         SpawnLocation newSpawnLocation;
         PlayerTeleportationParameter newPlayerTeleportationParameter;
-        try {
-            newSounds = SoundNotification.load(soundsFile);
-        } catch (NoSuchFileException | IllegalArgumentException e){
-            throw new ConfigException("sounds.yml", e.getMessage(), e);
-        }
-        this.sounds = newSounds;
         try {
             newSpawnLocation = SpawnLocation.load(spawnFile);
         } catch (NoSuchFileException | IllegalArgumentException e){
@@ -109,12 +99,6 @@ public class ConfigManager {
             this.textString = newTextString;
             this.text=newText;
         try {
-            newTimer = TimerDisplay.load(config,text);
-        } catch (NoSuchFileException | IllegalArgumentException e){
-            throw new ConfigException("config.yml", e.getMessage(), e);
-        }
-        this.timerDisplay = newTimer;
-        try {
             newPlayerTeleportationParameter = PlayerTeleportationParameter.load(config);
         } catch (NoSuchFileException | IllegalArgumentException e){
             throw new ConfigException("config.yml", e.getMessage(), e);
@@ -125,19 +109,8 @@ public class ConfigManager {
     public void reload() throws ConfigException{
         File config = ensure("config.yml");
         File langFile = ensure("lang/"+YamlConfiguration.loadConfiguration(config).getString("lang")+".yml","lang/en.yml");
-        ensure("sounds.yml");
         ensureSpawn();
 
-        try{
-            sounds.reload();
-        } catch (NoSuchFileException | IllegalArgumentException e){
-            throw new ConfigException("sounds.yml", e.getMessage(), e);
-        }
-        try{
-            timerDisplay.reload();
-        } catch (NoSuchFileException | IllegalArgumentException e){
-            throw new ConfigException("config.yml", e.getMessage(), e);
-        }
         try{
             spawnLocation.reload();
         } catch (NoSuchFileException | IllegalArgumentException e){
@@ -155,8 +128,7 @@ public class ConfigManager {
         }
     }
 
-    public SoundNotification sounds(){return sounds;}
-    public TimerDisplay timerDisplay(){return timerDisplay;}
+    public TeleportationSound sounds(){return sounds;}
     public SpawnLocation spawnLocation(){return spawnLocation;}
     public Text text(){return text;}
     public PlayerTeleportationParameter playerWaitTime(){return playerTeleportationParameter;}
