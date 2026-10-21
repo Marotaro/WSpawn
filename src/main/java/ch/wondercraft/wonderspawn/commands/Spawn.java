@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,8 +39,14 @@ public class Spawn {
                         Commands.argument("player", ArgumentTypes.player()).requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.spawn.other"))
                                 .executes(
                                         context -> {
-                                            Player target = context.getArgument("player", Player.class);
                                             CommandSender sender = context.getSource().getSender();
+                                            PlayerSelectorArgumentResolver resolver = context.getArgument("player", PlayerSelectorArgumentResolver.class);
+                                            var res = resolver.resolve(context.getSource());
+                                            if (res.size()!=1){
+                                                sender.sendMessage(text.forcedSpawnTryMoreThanOne());
+                                                return Command.SINGLE_SUCCESS;
+                                            }
+                                            Player target = res.getFirst();
                                             if (sender instanceof Player playerSender){
                                                 if (playerSender.equals(target)){
                                                     teleportationService.request(playerSender, teleportationService.getApplicableDelay(playerSender), teleportationService.getPlayerCanMove(playerSender)).thenAccept(
