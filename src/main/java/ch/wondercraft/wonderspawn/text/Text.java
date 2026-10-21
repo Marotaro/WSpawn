@@ -60,6 +60,8 @@ public class Text {
         return build("spawn.self.confirmation");
     }
 
+    public Component spawnUnknownError(){return build("spawn.error.dont-know");}
+
     public Component forcedSpawnNotice(CommandSender sender){
         return build("spawn.forced.target",
                 Placeholder.unparsed("sender",sender.getName())

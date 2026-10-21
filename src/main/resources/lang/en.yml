@@ -34,6 +34,7 @@ spawn:
     error:
       # Sent when the player moves during the countdown (teleport cancelled).
       moved: "<prefix><red>You moved, please try again."
+      dont-know: "<prefix><red>Sorry don't know what happend, but not good not good"
 
   # A player or the console forces another player to the spawn.
   forced:

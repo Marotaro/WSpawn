@@ -1,9 +1,7 @@
 package ch.wondercraft.wonderspawn;
 
-import ch.wondercraft.wonderspawn.teleportation.TeleportationSound;
 import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.text.TextString;
-import ch.wondercraft.wonderspawn.utils.PlayerTeleportationParameter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -26,7 +24,6 @@ public class ConfigManager {
     private TextString textString;
     private Text text;
     private SpawnLocation spawnLocation;
-    private PlayerTeleportationParameter playerTeleportationParameter;
 
     public ConfigManager(Plugin plugin){
         this.plugin = plugin;
@@ -81,7 +78,6 @@ public class ConfigManager {
         TextString newTextString;
         Text newText;
         SpawnLocation newSpawnLocation;
-        PlayerTeleportationParameter newPlayerTeleportationParameter;
         try {
             newSpawnLocation = SpawnLocation.load(spawnFile);
         } catch (NoSuchFileException | IllegalArgumentException e){
@@ -96,12 +92,6 @@ public class ConfigManager {
         }
             this.textString = newTextString;
             this.text=newText;
-        try {
-            newPlayerTeleportationParameter = PlayerTeleportationParameter.load(config);
-        } catch (NoSuchFileException | IllegalArgumentException e){
-            throw new ConfigException("config.yml", e.getMessage(), e);
-        }
-        this.playerTeleportationParameter = newPlayerTeleportationParameter;
     }
 
     public void reload() throws ConfigException{
@@ -115,11 +105,6 @@ public class ConfigManager {
             throw new ConfigException("spawnLocation.yml", e.getMessage(), e);
         }
         try {
-            playerTeleportationParameter.reload();
-        } catch (NoSuchFileException | IllegalArgumentException e){
-            throw new ConfigException("config.yml", e.getMessage(), e);
-        }
-        try {
             textString.reload(langFile);
         } catch (IllegalArgumentException e){
             throw new ConfigException("config.yml", e.getMessage(), e);
@@ -128,5 +113,4 @@ public class ConfigManager {
 
     public SpawnLocation spawnLocation(){return spawnLocation;}
     public Text text(){return text;}
-    public PlayerTeleportationParameter playerWaitTime(){return playerTeleportationParameter;}
 }

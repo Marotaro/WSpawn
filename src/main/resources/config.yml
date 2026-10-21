@@ -11,7 +11,7 @@ teleportation:
   default-can-move: false
   # If a player has several wspawn.teleportation.delay.<ticks> permissions:
   # true = use the smallest delay, false = use the biggest one
-  use-min: false
+  use-max-delay: false
 
 # Boss bar showing the countdown
 timer:
