@@ -41,6 +41,11 @@ sounds:
     name: "minecraft:block.note_block.pling"
     volume: 1
     pitch: 1.5
+  # Played when the player request a new teleportation while another was pending
+  canceled:
+    name: "minecraft:block.wet_sponge.break"
+    volume: 1
+    pitch: 1
   # Played when the player is teleported.
   final:
     name: "minecraft:entity.enderman.teleport"

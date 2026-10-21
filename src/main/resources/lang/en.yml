@@ -28,6 +28,7 @@ spawn:
     # Sent when the countdown starts.
     # Placeholders: <remaining-second>
     promise: "<prefix><green>You will be teleported to the spawn in <white><remaining-second><green>s."
+    canceled-promise: "<prefix><green>You canceled your previous request, you will now be teleported in <white><remaining-second><green>s."
     # Sent after the teleport succeeded.
     confirmation: "<prefix><green>You were teleported to the spawn <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>."
     error:

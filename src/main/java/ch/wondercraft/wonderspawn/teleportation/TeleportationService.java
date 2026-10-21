@@ -4,21 +4,21 @@ import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.CompletableFuture;
 
 public class TeleportationService {
-    private static enum REASON {COMMAND_SELF,EVENT}
     private Location spawnLocation;
     private Text text;
     private Plugin plugin;
     private TeleportationQueue teleportationQueue;
     private int defaultWaitTicks;
     private boolean defaultCanMove;
+    private TeleportationSound teleportationSound;
 
-    public TeleportationService(Plugin plugin, Text text, Location spawnLocation, TeleportationQueue teleportationQueue){
+    public TeleportationService(Plugin plugin, Text text, Location spawnLocation, TeleportationQueue teleportationQueue,
+                                TeleportationSound teleportationSound){
         this.plugin = plugin;
         ConfigChecker.warnIfMissing(plugin,"teleportation.default-tick-delay");
         this.defaultWaitTicks = plugin.getConfig().getInt("teleportation.default-tick-delay");
@@ -27,6 +27,7 @@ public class TeleportationService {
         this.text = text;
         this.spawnLocation = spawnLocation;
         this.teleportationQueue = teleportationQueue;
+        this.teleportationSound = teleportationSound;
     }
 
     public void reload(){
@@ -36,42 +37,42 @@ public class TeleportationService {
         this.defaultCanMove = plugin.getConfig().getBoolean("teleportation.default-can-move");
     }
 
-    public CompletableFuture<Boolean> request(Player player){
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
-        player.teleportAsync(spawnLocation).thenAccept(b->{
-            if (b){
-                player.sendMessage(text.spawnConfirmation());
-                future.complete(true);
+    public CompletableFuture<TeleportationOutCome> request(Player player){
+        CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
+        player.teleportAsync(spawnLocation).thenAccept(b -> {
+            if (b) {
+                teleportationSound.play(player, TeleportationSound.Type.FINAL);
+                future.complete(TeleportationOutCome.SUCCESS);
             } else {
-                //todo change that
-                player.sendMessage("bof");
-                future.complete(false);
+                teleportationSound.play(player, TeleportationSound.Type.ERROR);
+                future.complete(TeleportationOutCome.ERROR);
             }
         });
         return future;
     }
 
-    public CompletableFuture<Boolean> request(Player player, int waitTicks, boolean canMove){
+    public CompletableFuture<TeleportationOutCome> request(Player player, int waitTicks, boolean canMove){
         if (waitTicks == 0){
             return request(player);
         }
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
         teleportationQueue.add(player,waitTicks,canMove).thenAccept(waitOutCome -> {
-            if (waitOutCome== TeleportationQueue.WaitInfo.WaitOutCome.SUCCESS){
-                player.teleportAsync(spawnLocation).thenAccept(b ->{
-                    if (b){
-                        player.sendMessage(text.spawnConfirmation());
-                        future.complete(true);
+            if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.SUCCESS){
+                player.teleportAsync(spawnLocation).thenAccept(success -> {
+                    if (success){
+                        teleportationSound.play(player, TeleportationSound.Type.FINAL);
+                        future.complete(TeleportationOutCome.SUCCESS);
                     } else {
-                        player.sendMessage("bof");
-                        future.complete(false);
+                        teleportationSound.play(player, TeleportationSound.Type.ERROR);
+                        future.complete(TeleportationOutCome.ERROR);
                     }
                 });
             } else if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.MOVED) {
-                player.sendMessage(text.spawnPlayerMoved());
+                teleportationSound.play(player, TeleportationSound.Type.ERROR);
+                future.complete(TeleportationOutCome.MOVED);
+            } else if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.CANCELED) {
+                future.complete(TeleportationOutCome.CANCELED);
             }
-            if (waitOutCome != TeleportationQueue.WaitInfo.WaitOutCome.SUCCESS)
-                future.complete(false);
         });
         return future;
     }

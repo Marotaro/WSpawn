@@ -23,7 +23,7 @@ public class Spawn {
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (sender instanceof Player player){
-                        teleportationService.request(player);
+                        teleportationService.request(player, 100, false);
                         return Command.SINGLE_SUCCESS;
                     }
                     sender.sendMessage("need to be a player");

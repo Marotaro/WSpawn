@@ -6,6 +6,7 @@ import ch.wondercraft.wonderspawn.commands.SetSpawn;
 import ch.wondercraft.wonderspawn.commands.Spawn;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationQueue;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
+import ch.wondercraft.wonderspawn.teleportation.TeleportationSound;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.event.Listener;
@@ -15,6 +16,7 @@ public class WSpawn extends JavaPlugin implements Listener {
     private ConfigManager configManager = new ConfigManager(this);
     private TeleportationService teleportationService;
     private TeleportationQueue teleportationQueue;
+    private TeleportationSound teleportationSound;
 
     @Override
     public void onEnable(){
@@ -26,8 +28,9 @@ public class WSpawn extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        this.teleportationQueue = TeleportationQueue.load(this, configManager.text());
-        this.teleportationService = new TeleportationService(this,configManager.text(),configManager.spawnLocation(),teleportationQueue);
+        this.teleportationSound = TeleportationSound.load(this);
+        this.teleportationQueue = TeleportationQueue.load(this, configManager.text(),teleportationSound);
+        this.teleportationService = new TeleportationService(this,configManager.text(),configManager.spawnLocation(),teleportationQueue,teleportationSound);
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
             commands.register(Spawn.create(configManager.text(),teleportationService,configManager.playerWaitTime()).build());

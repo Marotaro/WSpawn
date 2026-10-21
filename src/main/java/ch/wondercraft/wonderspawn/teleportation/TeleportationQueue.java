@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class TeleportationQueue{
     private final Plugin plugin;
     private final Text text;
+    private final TeleportationSound teleportationSound;
     private final Map<UUID,WaitInfo> uuidWaitInfoMap = new ConcurrentHashMap<>();
     private final Map<UUID, BarTimer> uuidBossBarMap = new ConcurrentHashMap<>();
     private boolean textTimerActive;
@@ -24,9 +25,10 @@ public class TeleportationQueue{
     private BossBar.Color bossBarTimerColor;
     private Set<BossBar.Flag> bossBarTimerFlags;
 
-    private TeleportationQueue(Plugin plugin, Text text,Data data){
+    private TeleportationQueue(Plugin plugin, Text text,TeleportationSound teleportationSound,Data data){
         this.plugin = plugin;
         this.text = text;
+        this.teleportationSound = teleportationSound;
         apply(data);
         Bukkit.getScheduler().runTaskTimer(plugin,this::tickAll,0L,1L);
     }
@@ -46,9 +48,13 @@ public class TeleportationQueue{
     public CompletableFuture<WaitInfo.WaitOutCome> add(Player player, int waitTicks, boolean canMove){
         CompletableFuture<WaitInfo.WaitOutCome> waitOutCome = new CompletableFuture<>();
         if (uuidWaitInfoMap.containsKey(player.getUniqueId())){
+            teleportationSound.play(player, TeleportationSound.Type.CANCELED);
+            player.sendMessage(text.spawnCanceledPromise(waitTicks/20));
             uuidWaitInfoMap.get(player.getUniqueId()).update(waitTicks,canMove,waitOutCome);
             uuidBossBarMap.get(player.getUniqueId()).tick(waitTicks,waitTicks);
         } else {
+            teleportationSound.play(player, TeleportationSound.Type.INITIAL);
+            player.sendMessage(text.spawnPromise(waitTicks/20));
             uuidWaitInfoMap.put(player.getUniqueId(), new WaitInfo(player,waitTicks,canMove,waitOutCome));
             uuidBossBarMap.put(player.getUniqueId(),new BarTimer(player,waitTicks));
         }
@@ -78,8 +84,8 @@ public class TeleportationQueue{
         return new Data(textTimerActive,bossBarTimerActive,bossBarTimerPerSecondUpdate,bossBarTimerColor,bossBarTimerFlags);
     }
 
-    public static TeleportationQueue load(Plugin plugin, Text text){
-        return new TeleportationQueue(plugin,text,read(plugin));
+    public static TeleportationQueue load(Plugin plugin, Text text, TeleportationSound teleportationSound){
+        return new TeleportationQueue(plugin,text,teleportationSound,read(plugin));
     }
 
     public void reload(){
@@ -114,8 +120,10 @@ public class TeleportationQueue{
                 waitOutCome.complete(WaitOutCome.CANCELED);
                 return State.DONE;
             }
-            if (textTimerActive && elapsedTicks!=0 && remainingTick()%20==0 && remainingTick()!=0){
-                player.sendMessage(text.chat(remainingTick()/20));
+            if (elapsedTicks!=0 && remainingTick()%20==0 && remainingTick()!=0){
+                if (textTimerActive)
+                    player.sendMessage(text.chat(remainingTick()/20));
+                teleportationSound.play(player, TeleportationSound.Type.INTERVAL);
             }
             if (remainingTick()==0){
                 waitOutCome.complete(WaitOutCome.SUCCESS);

@@ -11,8 +11,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class TeleportationSound {
-    private static String CONFIG_NAME = "config.yml";
-    public enum Type {INITIAL, INTERVAL, FINAL, ERROR;}
+    public enum Type {INITIAL, INTERVAL, FINAL, ERROR,CANCELED;}
     private final Plugin plugin;
     private Map<Type, Sound> sounds;
 
@@ -25,7 +24,7 @@ public class TeleportationSound {
         Map<Type,Sound> result = new EnumMap<>(Type.class);
         for (Type type : Type.values()){
             String path = "sounds."+type.toString().toLowerCase();
-            ConfigChecker.warnIfMissing(plugin.getConfig(),CONFIG_NAME,plugin,path+".name");
+            ConfigChecker.warnIfMissing(plugin, path+".name");
             String name = plugin.getConfig().getString(path+".name");
 
             if (name == null || name.isBlank()) continue;
@@ -35,9 +34,9 @@ public class TeleportationSound {
             } catch (InvalidKeyException e) {
                 continue;
             }
-            ConfigChecker.warnIfMissing(plugin.getConfig(),CONFIG_NAME,plugin,path+".volume");
+            ConfigChecker.warnIfMissing(plugin,path+".volume");
             float volume = (float) plugin.getConfig().getDouble(path+".volume");
-            ConfigChecker.warnIfMissing(plugin.getConfig(),CONFIG_NAME,plugin,path+".pitch");
+            ConfigChecker.warnIfMissing(plugin,path+".pitch");
             float pitch = (float) plugin.getConfig().getDouble(path+".pitch");
             result.put(type,Sound.sound(key, Sound.Source.MASTER,volume,pitch));
         }

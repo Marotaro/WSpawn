@@ -23,7 +23,6 @@ public class ConfigManager {
     }
 
     private final Plugin plugin;
-    private TeleportationSound sounds;
     private TextString textString;
     private Text text;
     private SpawnLocation spawnLocation;
@@ -31,7 +30,6 @@ public class ConfigManager {
 
     public ConfigManager(Plugin plugin){
         this.plugin = plugin;
-        this.sounds = TeleportationSound.load(plugin);
     }
 
     private File ensure(String name) throws ConfigException{
@@ -128,7 +126,6 @@ public class ConfigManager {
         }
     }
 
-    public TeleportationSound sounds(){return sounds;}
     public SpawnLocation spawnLocation(){return spawnLocation;}
     public Text text(){return text;}
     public PlayerTeleportationParameter playerWaitTime(){return playerTeleportationParameter;}
