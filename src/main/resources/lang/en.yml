@@ -1,80 +1,109 @@
 # ──────────────────────────────────────────────
-# WSpawn - messages configuration
+#  WSpawn - messages
+# ──────────────────────────────────────────────
 # Format: MiniMessage (https://docs.advntr.dev/minimessage/format.html)
 #
-# The language file used by the plugin is selected in the general config file (config.yml).
-# To use another language, change the lang option there, then run /wspawn reload.
+# Language
+#   The language file in use is selected with the "lang" option in config.yml.
+#   Change it there, then run /wspawn reload.
+#   Only one language is active at a time for the whole server (no per-player language).
 #
-# Only one language can be active at a time for the whole server (there is no per-player language).
-# To create your own language, copy this file with all its entries, translate the values
-# (keep the keys and the <placeholders> unchanged), then select it in config.yml.
+# Creating your own language
+#   Copy this file with all its entries, translate the values only
+#   (keep the keys and the <placeholders> unchanged), then select it in config.yml.
 #
-# Global placeholders (usable in every message):
+# Global placeholders (usable in every message)
+#   <prefix>                        The prefix defined below
 #   <spawn-x> <spawn-y> <spawn-z>   Spawn coordinates
 #   <spawn-world>                   Spawn world name
 #   <spawn-yaw> <spawn-pitch>       Spawn rotation
-#   <prefix>                        The prefix defined below
 #
-# <sender> and <target> are a player name or "Console".
+# Placeholders specific to a message are listed above that message.
 # ──────────────────────────────────────────────
 
-# Prefix prepended to most chat messages (gradient + dark gray brackets).
+# Prefix prepended to most chat messages (gradient + dark gray brackets)
 prefix: "<dark_gray>[<gradient:#55ffff:#5555ff>WSpawn</gradient><dark_gray>] <gray>"
 
-# ── /spawn ────────────────────────────────────
+# ──────────────────────────────────────────────
+#  Commands
+# ──────────────────────────────────────────────
+
+# /spawn
 spawn:
-  # A player teleports themselves to the spawn.
+  # A player teleports themselves to the spawn
   self:
-    # Sent when the countdown starts.
+    # Sent when the countdown starts
     # Placeholders: <remaining-second>
-    promise: "<prefix><green>You will be teleported to the spawn in <white><remaining-second><green>s."
-    canceled-promise: "<prefix><green>You canceled your previous request, you will now be teleported in <white><remaining-second><green>s."
-    # Sent after the teleport succeeded.
+    countdown-start: "<prefix><green>You will be teleported to the spawn in <white><remaining-second><green>s."
+    # Sent when the player requests a new teleport while another is pending (the countdown restarts)
+    # Placeholders: <remaining-second>
+    countdown-restart: "<prefix><green>You canceled your previous request, you will now be teleported in <white><remaining-second><green>s."
+    # Sent after the teleport succeeded
     confirmation: "<prefix><green>You were teleported to the spawn <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>."
     error:
-      # Sent when the player moves during the countdown (teleport cancelled).
+      # Sent when the player moves during the countdown (teleport cancelled)
       moved: "<prefix><red>You moved, please try again."
-      dont-know: "<prefix><red>Sorry don't know what happend, but not good not good"
+      # Sent when the teleport fails for an unexpected reason
+      unknown: "<prefix><red>Sorry don't know what happend, but not good not good"
 
-  # A player or the console forces another player to the spawn.
+  # A player or the console forces another player to the spawn
+  # Placeholders (all messages below): <sender> <target>, each a player name or "Console"
   forced:
-    # Message received by the teleported player.
-    # Placeholders: <sender>
+    # Received by the teleported player
     target: "<prefix><green>You were teleported to the spawn by <white><sender><green>."
-    # Message received by whoever ran the command.
-    # Placeholders: <target>
+    # Received by whoever ran the command
     sender: "<prefix><green>You teleported <white><target> <green>to the spawn."
     error:
-      # Sent when the command targets several players (e.g. @a or a selector).
-      more-than-one: "<prefix><red>You cannot force-teleport more than one player at a time."
+      # Sent when the command targets several players (e.g. @a or another selector)
+      multiple-targets: "<prefix><red>You cannot force-teleport more than one player at a time."
 
-# ── /setspawn ─────────────────────────────────
+# /setspawn
+# Here <spawn-*> is the NEW location, and <old-*> is the previous one.
 set-spawn:
-  # Sent after the spawn is changed.
-  # <spawn-*> = the NEW location, <old-*> = the previous one.
+  # Sent after the spawn is changed
   # Placeholders: <old-x> <old-y> <old-z> <old-world> <old-yaw> <old-pitch>
   confirmation: "<prefix><green>The spawn location was set successfully <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>. Previous location: <dark_gray>(<yellow><old-x><gray>, <yellow><old-y><gray>, <yellow><old-z><dark_gray>)<green>."
   error:
-    # Sent when the console runs the command without explicit coordinates.
-    needs-verbose-version: "<prefix><red>As the console, you need to use the verbose version of this command."
+    # Sent when the console runs the command without explicit coordinates
+    console-needs-coordinates: "<prefix><red>As the console, you need to use the verbose version of this command."
 
-# ── /wspawn reload ────────────────────────────
+# /wspawn reload
 reload:
-  # Sent when the reload starts.
-  promise: "<prefix><green>Reloading configs..."
-  # Sent when the reload finished without errors.
+  # Sent when the reload starts
+  start: "<prefix><green>Reloading configs..."
+  # Sent when the reload finished without errors
   confirmation: "<prefix><green>Configs reloaded successfully."
   error:
-    # Sent when a config file fails to load.
+    # Sent when a config file fails to load
     # Placeholders: <error-file> <error-message>
-    bad: "<prefix><red>Something went wrong while reloading <white><error-file><red>: <white><error-message><red>."
+    failed: "<prefix><red>Something went wrong while reloading <white><error-file><red>: <white><error-message><red>."
 
-# ── Countdown display ─────────────────────────
-# Shown while the player must stand still before being teleported.
+# ──────────────────────────────────────────────
+#  Countdown display
+# ──────────────────────────────────────────────
+# Shown while the player must stand still before being teleported
+# (each one is enabled in the "timer" section of config.yml)
 # Placeholders: <remaining-second>
 timer:
-  # Boss bar title (no prefix, to keep it short).
+  # Boss bar title (no prefix, to keep it short)
   bar: "<red>Stay still for <white><remaining-second><red>s"
-  # Chat display.
-  # Placeholder: <remaining-second>
+  # Chat message
   chat: "<prefix><red>Stay still for <white><remaining-second><red>s."
+
+# ──────────────────────────────────────────────
+#  Automatic teleports
+# ──────────────────────────────────────────────
+# Messages sent when a player is automatically teleported to the spawn,
+# on join or on respawn
+events:
+  # Sent when a player is teleported on every join (first join excluded)
+  on-join: ""
+  # Sent when a player is teleported on their first join
+  on-first-join: ""
+  # Sent when a player respawns at the spawn because their respawn block
+  # (bed or respawn anchor) is missing or was destroyed
+  on-respawn-block-missing: ""
+  # Sent when a player with a bed respawn point is sent to the spawn instead
+  on-respawn-override-bed: ""
+  # Sent when a player with a respawn anchor is sent to the spawn instead
+  on-respawn-override-anchor: ""

@@ -1,57 +1,95 @@
-# Plugin language file to use (e.g. "en")
+# ──────────────────────────────────────────────
+#  General
+# ──────────────────────────────────────────────
+
+# Language file used by the plugin (e.g. "en")
 lang: "en"
 
+# ──────────────────────────────────────────────
+#  Automatic teleports
+# ──────────────────────────────────────────────
+events:
+  # Teleport players to spawn the first time they join
+  on-first-join: false
+  # Teleport players to spawn every time they join (first join excluded)
+  on-join: true
+  respawn:
+    if-missing: true
+    override-bed: false
+    override-anchor: false
+
+# ──────────────────────────────────────────────
+#  Teleportation behaviour
+# ──────────────────────────────────────────────
 teleportation:
-  # Default countdown before the teleport, in ticks (20 ticks = 1 second, so 100 = 5 s)
+  # Countdown before the teleport, in ticks (20 ticks = 1 second, so 100 = 5 s)
   # Used when the player has no wspawn.teleportation.delay.<ticks> permission
   # Players with wspawn.teleportation.delay.bypass skip the countdown entirely
   default-tick-delay: 100
-  # Whether players may move during the countdown
-  # (wspawn.teleportation.move allows it regardless of this value)
-  default-can-move: false
   # If a player has several wspawn.teleportation.delay.<ticks> permissions:
-  # true = use the smallest delay, false = use the biggest one
+  # true = use the longest delay, false = use the shortest one
   use-max-delay: false
+  # Allow players to move during the countdown
+  # (the wspawn.teleportation.move permission allows it regardless of this value)
+  default-can-move: false
+  # Keep the player's fall distance after teleporting (otherwise it is reset)
+  # (wspawn.teleportation.keep-fall-distance overrides this value)
+  default-keep-fall-distance: false
+  # Make the player face the orientation defined by the spawn point
+  # (wspawn.teleportation.face-set-orientation overrides this value)
+  default-face-set-orientation: true
 
-# Boss bar showing the countdown
+# ──────────────────────────────────────────────
+#  Countdown display
+# ──────────────────────────────────────────────
 timer:
+  # Show the remaining time as text
   text:
     active: true
+  # Show the remaining time as a boss bar
   bossbar:
-    # Bar color (Adventure BossBar.Color: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE)
-    color: "BLUE"
     # Enable or disable the boss bar
     active: true
-    # Update the displayed time every second instead of every tick
+    # Bar color (Adventure BossBar.Color: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE)
+    color: "BLUE"
+    # Refresh the displayed time every second instead of every tick
     per-second-update: true
     # Boss bar flags (Adventure BossBar.Flag), remove any you don't want
     flags:
       - DARKEN_SCREEN      # darkens the sky
-      - PLAY_BOSS_MUSIC    # plays boss music
+      - PLAY_BOSS_MUSIC    # plays boss music (doesn't work for some reason...)
       - CREATE_WORLD_FOG   # adds fog
 
+# ──────────────────────────────────────────────
+#  Sounds
+# ──────────────────────────────────────────────
+# Sound names are the ones suggested by Minecraft's /playsound command
+# (e.g. "minecraft:block.note_block.pling").
+# You can also use custom sounds added through a resource pack
+# (e.g. "mypack:teleport.whoosh").
+# To mute a sound, set its name entry to "" (e.g. name: "").
 sounds:
-  # Played when the countdown starts.
+  # Played when the countdown starts
   initial:
     name: "minecraft:block.beacon.activate"
     volume: 1
     pitch: 1.5
-  # Played every second during the countdown.
+  # Played every second during the countdown
   interval:
     name: "minecraft:block.note_block.pling"
     volume: 1
     pitch: 1.5
-  # Played when the player request a new teleportation while another was pending
-  canceled:
-    name: "minecraft:block.wet_sponge.break"
-    volume: 1
-    pitch: 1
-  # Played when the player is teleported.
+  # Played when the player is teleported
   final:
     name: "minecraft:entity.enderman.teleport"
     volume: 1
     pitch: 1
-  # Played when the teleport is cancelled (e.g. the player moved).
+  # Played when the player requests a new teleport while another is pending
+  canceled:
+    name: "minecraft:block.wet_sponge.break"
+    volume: 1
+    pitch: 1
+  # Played when the teleport fails or is cancelled (e.g. the player moved)
   error:
     name: "minecraft:entity.villager.no"
     volume: 1

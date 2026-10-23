@@ -27,7 +27,6 @@ public class TeleportationSound {
             ConfigChecker.warnIfMissing(plugin, path+".name");
             String name = plugin.getConfig().getString(path+".name");
 
-            if (name == null || name.isBlank()) continue;
             Key key;
             try {
                 key = Key.key(name);
@@ -44,10 +43,12 @@ public class TeleportationSound {
     }
 
     public static TeleportationSound load(Plugin plugin){
+        plugin.getLogger().info("loading Sounds");
         return new TeleportationSound(plugin,read(plugin));
     }
 
     public void reload(){
+        plugin.getLogger().info("reloading Sounds");
         this.sounds = read(plugin);
     }
 

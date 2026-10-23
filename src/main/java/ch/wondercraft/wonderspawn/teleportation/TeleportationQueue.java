@@ -85,10 +85,12 @@ public class TeleportationQueue{
     }
 
     public static TeleportationQueue load(Plugin plugin, Text text, TeleportationSound teleportationSound){
+        plugin.getLogger().info("loading TeleportationQueue");
         return new TeleportationQueue(plugin,text,teleportationSound,read(plugin));
     }
 
     public void reload(){
+        plugin.getLogger().info("reloading TeleportationQueue");
         apply(read(plugin));
     }
 
@@ -163,9 +165,10 @@ public class TeleportationQueue{
         }
 
         private void tick(int remainingTicks, int waitTicks){
+            if (remainingTicks%20==0)
+                bossBar.name(text.bar(remainingTicks/20));
             if (!bossBarTimerPerSecondUpdate || remainingTicks % 20 == 0){
                 bossBar.progress(Math.max(0,(float)remainingTicks/waitTicks));
-                bossBar.name(text.bar(remainingTicks/20));
             }
             if (remainingTicks<=0)
                 player.hideBossBar(bossBar);

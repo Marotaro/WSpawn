@@ -2,6 +2,8 @@ package ch.wondercraft.wonderspawn.teleportation;
 
 import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
+import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
+import io.papermc.paper.math.Rotation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
@@ -17,11 +19,14 @@ public class TeleportationService {
     private int defaultWaitTicks;
     private boolean defaultCanMove;
     private boolean useMaxDelay;
+    private boolean defaultKeepFallDistance;
+    private boolean defaultFaceSetSpawnOrientation;
     private TeleportationSound teleportationSound;
 
     public TeleportationService(Plugin plugin, Text text, Location spawnLocation, TeleportationQueue teleportationQueue,
                                 TeleportationSound teleportationSound){
         this.plugin = plugin;
+        plugin.getLogger().info("Loading TeleportationService");
         read();
         this.text = text;
         this.spawnLocation = spawnLocation;
@@ -36,16 +41,24 @@ public class TeleportationService {
         this.defaultCanMove = plugin.getConfig().getBoolean("teleportation.default-can-move");
         ConfigChecker.warnIfMissing(plugin,"teleportation.use-max-delay");
         this.useMaxDelay = plugin.getConfig().getBoolean("teleportation.use-max-delay");
+        ConfigChecker.warnIfMissing(plugin,"teleportation.default-keep-fall-distance");
+        this.defaultKeepFallDistance = plugin.getConfig().getBoolean("teleportation.default-keep-fall-distance");
+        ConfigChecker.warnIfMissing(plugin,"teleportation.default-face-set-orientation");
+        this.defaultFaceSetSpawnOrientation = plugin.getConfig().getBoolean("teleportation.default-face-set-orientation");
     }
 
     public void reload(){
+        plugin.getLogger().info("reloading TeleportationService");
         read();
     }
 
     public CompletableFuture<TeleportationOutCome> request(Player player){
         CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
+        Rotation playerRotation = player.getLocation().getRotation();
         player.teleportAsync(spawnLocation).thenAccept(b -> {
             if (b) {
+                if (!getPlayerFaceSetOrientation(player)) player.setRotation(playerRotation.yaw(),playerRotation.pitch());
+                if (!getPlayerKeepFallDistance(player)) player.setFallDistance(0L);
                 teleportationSound.play(player, TeleportationSound.Type.FINAL);
                 future.complete(TeleportationOutCome.SUCCESS);
             } else {
@@ -63,8 +76,11 @@ public class TeleportationService {
         CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
         teleportationQueue.add(player,waitTicks,canMove).thenAccept(waitOutCome -> {
             if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.SUCCESS){
+                Rotation playerRotation = player.getLocation().getRotation();
                 player.teleportAsync(spawnLocation).thenAccept(success -> {
                     if (success){
+                        if (!getPlayerFaceSetOrientation(player)) player.setRotation(playerRotation.yaw(),playerRotation.pitch());
+                        if (!getPlayerKeepFallDistance(player)) player.setFallDistance(0L);
                         teleportationSound.play(player, TeleportationSound.Type.FINAL);
                         future.complete(TeleportationOutCome.SUCCESS);
                     } else {
@@ -101,9 +117,16 @@ public class TeleportationService {
     }
 
     public boolean getPlayerCanMove(Player player){
-        if (!player.isPermissionSet("wspawn.teleportation.move"))
-            return this.defaultCanMove;
-        else
-            return player.hasPermission("wspawn.teleportation.move");
+       return SimpleBooleanDefaultPerm.getter(player,"wspawn.teleportation.move", defaultCanMove);
     }
+
+    private boolean getPlayerKeepFallDistance(Player player){
+        return SimpleBooleanDefaultPerm.getter(player,"wspawn.teleportation.keep-fall-distance", defaultKeepFallDistance);
+    }
+
+    private boolean getPlayerFaceSetOrientation(Player player){
+        return SimpleBooleanDefaultPerm.getter(player,"wspawn.teleportation.face-set-orientation", defaultFaceSetSpawnOrientation);
+    }
+
+
 }

@@ -9,6 +9,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
 
 public class Text {
     private  MiniMessage mm = MiniMessage.builder().build();
@@ -45,11 +46,11 @@ public class Text {
     }
 
     public Component spawnPromise(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"spawn.self.promise");
+        return textWithRemainingSecond(remainingSecond,"spawn.self.coutdown-start");
     }
 
     public Component spawnCanceledPromise(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"spawn.self.canceled-promise");
+        return textWithRemainingSecond(remainingSecond,"spawn.self.coutdown-restart");
     }
 
     public Component spawnPlayerMoved(){
@@ -60,7 +61,7 @@ public class Text {
         return build("spawn.self.confirmation");
     }
 
-    public Component spawnUnknownError(){return build("spawn.error.dont-know");}
+    public Component spawnUnknownError(){return build("spawn.self.error.unknown");}
 
     public Component forcedSpawnNotice(CommandSender sender){
         return build("spawn.forced.target",
@@ -75,7 +76,7 @@ public class Text {
     }
 
     public Component forcedSpawnTryMoreThanOne(){
-        return build("spawn.forced.error.more-than-one");
+        return build("spawn.forced.error.multiple-targets");
     }
 
 
@@ -99,11 +100,11 @@ public class Text {
     }
 
     public Component setSpawnNeedsVerboseVersion(){
-        return build("set-spawn.error.needs-verbose");
+        return build("set-spawn.error.console-needs-coordinates");
     }
 
     public Component reloadPromise(){
-        return build("reload.promise");
+        return build("reload.start");
     }
 
     public Component reloadConfirmation(){
@@ -111,10 +112,20 @@ public class Text {
     }
 
     public Component reloadFailed(ConfigManager.ConfigException e){
-        return build("reload.error.bad",
+        return build("reload.error.failed",
                 Placeholder.unparsed("error-file",e.getFileName()),
                 Placeholder.unparsed("error-message",e.getMessage())
                 );
     }
+
+    public Component onJoinTeleportation(){return build("events.on-join");}
+
+    public Component onFirstJoinTeleportation(){return build("events.on-first-join");}
+
+    public Component onRespawnBlockMissing(){return build("events.on-respawn-block-missing");}
+
+    public Component onRespawnOverrideBed(){return build("events.on-respawn-override-bed");}
+
+    public Component onRespawnOverrideAnchor(){return build("events.on-respawn-override-anchor");}
 
 }
