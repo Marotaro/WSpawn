@@ -46,15 +46,15 @@ public class RespawnEvent implements Listener {
         Player player = event.getPlayer();
         if (event.isMissingRespawnBlock() && SimpleBooleanDefaultPerm.getter(player,"wspawn.event.respawn.block-missing",defaultIfMissing)){
             event.setRespawnLocation(spawnLocation);
-            player.sendMessage(text.onRespawnBlockMissing());
+            text.send(player,text.onRespawnBlockMissing());
         }
         else if (event.isBedSpawn() && SimpleBooleanDefaultPerm.getter(player,"wspawn.event.respawn.override-bed",defaultOverRideBedRespawn)){
             event.setRespawnLocation(spawnLocation);
-            player.sendMessage(text.onRespawnOverrideBed());
+            text.send(player,text.onRespawnOverrideBed());
         }
         else if (event.isAnchorSpawn() && SimpleBooleanDefaultPerm.getter(player,"wspawn.event.respawn.override-anchor",defaultOverRideAnchorRespawn)) {
             event.setRespawnLocation(spawnLocation);
-            player.sendMessage(text.onRespawnOverrideAnchor());
+            text.send(player,text.onRespawnOverrideAnchor());
         }
     }
 

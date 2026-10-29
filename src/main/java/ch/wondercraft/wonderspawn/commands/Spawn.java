@@ -23,11 +23,11 @@ public class Spawn {
                         teleportationService.request(player, teleportationService.getApplicableDelay(player), teleportationService.getPlayerCanMove(player)).thenAccept(
                                 teleportationOutCome -> {
                                     if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                                        player.sendMessage(text.spawnConfirmation());
+                                        text.send(player,text.spawnConfirmation());
                                     else if (teleportationOutCome==TeleportationOutCome.MOVED) {
-                                        player.sendMessage(text.spawnPlayerMoved());
+                                        text.send(player,text.spawnPlayerMoved());
                                     } else if (teleportationOutCome==TeleportationOutCome.ERROR) {
-                                        player.sendMessage(text.spawnUnknownError());
+                                        text.send(player,text.spawnUnknownError());
                                     }
                                 }
                         );
@@ -52,32 +52,32 @@ public class Spawn {
                                                     teleportationService.request(playerSender, teleportationService.getApplicableDelay(playerSender), teleportationService.getPlayerCanMove(playerSender)).thenAccept(
                                                             teleportationOutCome -> {
                                                                 if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                                                                    playerSender.sendMessage(text.spawnConfirmation());
+                                                                    text.send(playerSender,text.spawnConfirmation());
                                                                 else if (teleportationOutCome==TeleportationOutCome.MOVED) {
-                                                                    playerSender.sendMessage(text.spawnPlayerMoved());
+                                                                    text.send(playerSender,text.spawnPlayerMoved());
                                                                 } else if (teleportationOutCome==TeleportationOutCome.ERROR) {
-                                                                    playerSender.sendMessage(text.spawnUnknownError());
+                                                                    text.send(playerSender,text.spawnUnknownError());
                                                                 }
                                                             }
                                                     );
                                                 } else {
                                                     teleportationService.request(target).thenAccept(teleportationOutCome -> {
                                                         if (teleportationOutCome==TeleportationOutCome.SUCCESS){
-                                                            playerSender.sendMessage(text.forcedSpawnConfirmation(target));
-                                                            target.sendMessage(text.forcedSpawnNotice(sender));
+                                                            text.send(playerSender,text.forcedSpawnConfirmation(target));
+                                                            text.send(target,text.forcedSpawnNotice(playerSender));
                                                         } else {
-                                                            playerSender.sendMessage(text.spawnUnknownError());
-                                                            target.sendMessage(text.spawnUnknownError());
+                                                            text.send(playerSender,text.spawnUnknownError());
+                                                            text.send(target,text.spawnUnknownError());
                                                         }
                                                     });
                                                 }
                                             } else {
                                                 teleportationService.request(target).thenAccept(teleportationOutCome -> {
                                                     if (teleportationOutCome==TeleportationOutCome.SUCCESS){
-                                                        target.sendMessage(text.forcedSpawnNotice(sender));
+                                                        text.send(target,text.forcedSpawnNotice(sender));
                                                         sender.sendMessage(text.forcedSpawnConfirmation(target));
                                                     } else {
-                                                        target.sendMessage(text.spawnUnknownError());
+                                                        text.send(target,text.spawnUnknownError());
                                                         sender.sendMessage(text.spawnUnknownError());
                                                     }
                                                 });

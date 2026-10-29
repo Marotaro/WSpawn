@@ -45,14 +45,14 @@ public class JoinEvent implements Listener {
             if (teleportOnJoin){
                 teleportationService.request(player).thenAccept(teleportationOutCome -> {
                     if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                        player.sendMessage(text.onJoinTeleportation());
+                        text.send(player,text.onJoinTeleportation());
                 });
             }
         else
             if (teleportOnFirstJoin){
                 teleportationService.request(player).thenAccept(teleportationOutCome -> {
                     if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                        player.sendMessage(text.onFirstJoinTeleportation());
+                        text.send(player,text.onFirstJoinTeleportation());
                 });
             }
     }

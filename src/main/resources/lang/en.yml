@@ -46,13 +46,17 @@ spawn:
       # Sent when the teleport fails for an unexpected reason
       unknown: "<prefix><red>Sorry don't know what happend, but not good not good"
 
-  # A player or the console forces another player to the spawn
-  # Placeholders (all messages below): <sender> <target>, each a player name or "Console"
   forced:
     # Received by the teleported player
-    target: "<prefix><green>You were teleported to the spawn by <white><sender><green>."
+    # Placeholders:
+    # <sender> is the player's name, or "CONSOLE" when run from console (ConsoleCommandSender#getName)
+    # <head> is only available in the "player" message (console has no skin)
+    target:
+      console: "<prefix><green>You were teleported to the spawn by <white><sender><green>."
+      player: "<prefix><green>You were teleported to the spawn by <reset><head> <white><sender><green>."
     # Received by whoever ran the command
-    sender: "<prefix><green>You teleported <white><target> <green>to the spawn."
+    # Placeholder: <head>
+    sender: "<prefix><green>You teleported <reset><head><white><target> <green>to the spawn."
     error:
       # Sent when the command targets several players (e.g. @a or another selector)
       multiple-targets: "<prefix><red>You cannot force-teleport more than one player at a time."
@@ -85,7 +89,7 @@ reload:
 # (each one is enabled in the "timer" section of config.yml)
 # Placeholders: <remaining-second>
 timer:
-  # Boss bar title (no prefix, to keep it short)
+  # Boss bar title
   bar: "<red>Stay still for <white><remaining-second><red>s"
   # Chat message
   chat: "<prefix><red>Stay still for <white><remaining-second><red>s."
@@ -102,8 +106,8 @@ events:
   on-first-join: ""
   # Sent when a player respawns at the spawn because their respawn block
   # (bed or respawn anchor) is missing or was destroyed
-  on-respawn-block-missing: ""
+  on-respawn-block-missing: "<prefix><green>You were teleported to spawn because you are missing an respawn point."
   # Sent when a player with a bed respawn point is sent to the spawn instead
-  on-respawn-override-bed: ""
+  on-respawn-override-bed: "<prefix><green>You were teleported to spawn, but you still have a bed placed and accessible."
   # Sent when a player with a respawn anchor is sent to the spawn instead
-  on-respawn-override-anchor: ""
+  on-respawn-override-anchor: "<prefix><green>You were teleported to spawn, but you still have an respawn anchor active."

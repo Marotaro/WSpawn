@@ -49,12 +49,12 @@ public class TeleportationQueue{
         CompletableFuture<WaitInfo.WaitOutCome> waitOutCome = new CompletableFuture<>();
         if (uuidWaitInfoMap.containsKey(player.getUniqueId())){
             teleportationSound.play(player, TeleportationSound.Type.CANCELED);
-            player.sendMessage(text.spawnCanceledPromise(waitTicks/20));
+            text.send(player,text.spawnCanceledPromise(waitTicks/20));
             uuidWaitInfoMap.get(player.getUniqueId()).update(waitTicks,canMove,waitOutCome);
             uuidBossBarMap.get(player.getUniqueId()).tick(waitTicks,waitTicks);
         } else {
             teleportationSound.play(player, TeleportationSound.Type.INITIAL);
-            player.sendMessage(text.spawnPromise(waitTicks/20));
+            text.send(player,text.spawnPromise(waitTicks/20));
             uuidWaitInfoMap.put(player.getUniqueId(), new WaitInfo(player,waitTicks,canMove,waitOutCome));
             uuidBossBarMap.put(player.getUniqueId(),new BarTimer(player,waitTicks));
         }
@@ -124,7 +124,7 @@ public class TeleportationQueue{
             }
             if (elapsedTicks!=0 && remainingTick()%20==0 && remainingTick()!=0){
                 if (textTimerActive)
-                    player.sendMessage(text.chat(remainingTick()/20));
+                    text.send(player,text.chat(remainingTick()/20));
                 teleportationSound.play(player, TeleportationSound.Type.INTERVAL);
             }
             if (remainingTick()==0){

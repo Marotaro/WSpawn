@@ -6,6 +6,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.object.ObjectContents;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -41,16 +43,22 @@ public class Text {
         }
     }
 
+    public void send(Player player, Component component){
+        if (!PlainTextComponentSerializer.plainText().serialize(component).isBlank()){
+            player.sendMessage(component);
+        }
+    }
+
     private Component textWithRemainingSecond(int remainingSecond, String key){
         return build(key,Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
     }
 
     public Component spawnPromise(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"spawn.self.coutdown-start");
+        return textWithRemainingSecond(remainingSecond,"spawn.self.countdown-start");
     }
 
     public Component spawnCanceledPromise(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"spawn.self.coutdown-restart");
+        return textWithRemainingSecond(remainingSecond,"spawn.self.countdown-restart");
     }
 
     public Component spawnPlayerMoved(){
@@ -64,14 +72,22 @@ public class Text {
     public Component spawnUnknownError(){return build("spawn.self.error.unknown");}
 
     public Component forcedSpawnNotice(CommandSender sender){
-        return build("spawn.forced.target",
+        return build("spawn.forced.target.console",
                 Placeholder.unparsed("sender",sender.getName())
+                );
+    }
+
+    public Component forcedSpawnNotice(Player sender){
+        return build("spawn.forced.target.player",
+                Placeholder.unparsed("sender",sender.getName()),
+                Placeholder.component("head",Component.object(ObjectContents.playerHead(sender.getUniqueId())))
                 );
     }
 
     public Component forcedSpawnConfirmation(Player target){
         return build("spawn.forced.sender",
-                Placeholder.unparsed("target",target.getName())
+                Placeholder.unparsed("target",target.getName()),
+                Placeholder.component("head",Component.object(ObjectContents.playerHead(target.getName())))
         );
     }
 
