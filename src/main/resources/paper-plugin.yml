@@ -1,5 +1,5 @@
 name: WSpawn
-version: '0.0.1'
+version: '0.0.2'
 main: ch.wondercraft.wonderspawn.WSpawn
 description: A somewhat customizable Spawn plugin
 api-version: '26.1.2'
@@ -22,3 +22,5 @@ permissions:
   wspawn.teleportation.move:
     description: "let player move when waiting"
     default: op
+  wspawn.teleportation.cooldown.bypass:
+    description: "let player bypass cooldown for new request"

@@ -95,13 +95,20 @@ public class Text {
         return build("spawn.forced.error.multiple-targets");
     }
 
+    public Component barCanMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.bossbar.can-move");}
 
-    public Component bar(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"timer.bar");
+    public Component barCannotMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.bossbar.cannot-move");}
+
+    public Component bar(int remainingSecond, boolean canMove){
+        return (canMove)? barCanMove(remainingSecond): barCannotMove(remainingSecond);
     }
 
-    public Component chat(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"timer.chat");
+    public Component chatCanMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.chat.can-move");}
+
+    public Component chatCanNotMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.chat.cannot-move");}
+
+    public Component chat(int remainingSecond, boolean canMove){
+        return (canMove)? chatCanMove(remainingSecond): chatCanNotMove(remainingSecond);
     }
 
     public Component setSpawnConfirmation(Location oldLocation){
@@ -117,6 +124,12 @@ public class Text {
 
     public Component setSpawnNeedsVerboseVersion(){
         return build("set-spawn.error.console-needs-coordinates");
+    }
+
+    public Component cooldownDenied(int remainingSecond){
+        return build("spawn.cooldown",
+                Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond))
+                );
     }
 
     public Component reloadPromise(){

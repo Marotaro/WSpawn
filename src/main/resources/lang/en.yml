@@ -12,6 +12,10 @@
 #   Copy this file with all its entries, translate the values only
 #   (keep the keys and the <placeholders> unchanged), then select it in config.yml.
 #
+# Empty messages
+#   Any message set to "" is simply not sent (no chat message, no error).
+#   Use this to disable a message you don't want.
+#
 # Global placeholders (usable in every message)
 #   <prefix>                        The prefix defined below
 #   <spawn-x> <spawn-y> <spawn-z>   Spawn coordinates
@@ -35,31 +39,35 @@ spawn:
     # Sent when the countdown starts
     # Placeholders: <remaining-second>
     countdown-start: "<prefix><green>You will be teleported to the spawn in <white><remaining-second><green>s."
-    # Sent when the player requests a new teleport while another is pending (the countdown restarts)
+    # Sent when a new request replaces a pending one (the countdown restarts)
     # Placeholders: <remaining-second>
-    countdown-restart: "<prefix><green>You canceled your previous request, you will now be teleported in <white><remaining-second><green>s."
+    countdown-restart: "<prefix><green>Previous request canceled, you will now be teleported in <white><remaining-second><green>s."
     # Sent after the teleport succeeded
     confirmation: "<prefix><green>You were teleported to the spawn <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>."
     error:
       # Sent when the player moves during the countdown (teleport cancelled)
       moved: "<prefix><red>You moved, please try again."
       # Sent when the teleport fails for an unexpected reason
-      unknown: "<prefix><red>Sorry don't know what happend, but not good not good"
+      unknown: "<prefix><red>Something went wrong, please try again."
 
   forced:
     # Received by the teleported player
-    # Placeholders:
-    # <sender> is the player's name, or "CONSOLE" when run from console (ConsoleCommandSender#getName)
-    # <head> is only available in the "player" message (console has no skin)
+    # Placeholders: <sender> (player name, or "CONSOLE" when run from the console)
+    #               <head> (only in "player", the console has no skin)
     target:
       console: "<prefix><green>You were teleported to the spawn by <white><sender><green>."
       player: "<prefix><green>You were teleported to the spawn by <reset><head> <white><sender><green>."
     # Received by whoever ran the command
-    # Placeholder: <head>
+    # Placeholders: <head> <target>
     sender: "<prefix><green>You teleported <reset><head><white><target> <green>to the spawn."
     error:
       # Sent when the command targets several players (e.g. @a or another selector)
-      multiple-targets: "<prefix><red>You cannot force-teleport more than one player at a time."
+      multiple-targets: "<prefix><red>You can only teleport one player at a time."
+
+
+  # Sent when the player uses /spawn while on cooldown
+  # Placeholders: <remaining-second>
+  cooldown: "<prefix><green>You are on cooldown for <white><remaining-second><green>s."
 
 # /setspawn
 # Here <spawn-*> is the NEW location, and <old-*> is the previous one.
@@ -69,7 +77,7 @@ set-spawn:
   confirmation: "<prefix><green>The spawn location was set successfully <dark_gray>(<yellow><spawn-x><gray>, <yellow><spawn-y><gray>, <yellow><spawn-z><dark_gray>)<green>. Previous location: <dark_gray>(<yellow><old-x><gray>, <yellow><old-y><gray>, <yellow><old-z><dark_gray>)<green>."
   error:
     # Sent when the console runs the command without explicit coordinates
-    console-needs-coordinates: "<prefix><red>As the console, you need to use the verbose version of this command."
+    console-needs-coordinates: "<prefix><red>From the console, you must specify the coordinates."
 
 # /wspawn reload
 reload:
@@ -90,9 +98,13 @@ reload:
 # Placeholders: <remaining-second>
 timer:
   # Boss bar title
-  bar: "<red>Stay still for <white><remaining-second><red>s"
+  bossbar:
+    cannot-move: "<red>Stay still for <white><remaining-second><red>s"
+    can-move: "<green>Teleportation in <white><remaining-second><green>s"
   # Chat message
-  chat: "<prefix><red>Stay still for <white><remaining-second><red>s."
+  chat:
+    cannot-move: "<prefix><red>Stay still for <white><remaining-second><red>s."
+    can-move: "<prefix><green>Teleportation in <white><remaining-second><green>s"
 
 # ──────────────────────────────────────────────
 #  Automatic teleports

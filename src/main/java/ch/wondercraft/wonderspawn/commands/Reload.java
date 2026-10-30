@@ -3,6 +3,7 @@ package ch.wondercraft.wonderspawn.commands;
 import ch.wondercraft.wonderspawn.ConfigManager;
 import ch.wondercraft.wonderspawn.events.JoinEvent;
 import ch.wondercraft.wonderspawn.events.RespawnEvent;
+import ch.wondercraft.wonderspawn.teleportation.TeleportationCooldown;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationQueue;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationSound;
@@ -20,6 +21,7 @@ public class Reload {
                                                                     TeleportationSound teleportationSound,
                                                                     TeleportationService teleportationService,
                                                                     TeleportationQueue  teleportationQueue,
+                                                                    TeleportationCooldown teleportationCooldown,
                                                                     JoinEvent joinEvent,
                                                                     RespawnEvent respawnEvent){
         return Commands.literal("reload").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.reload"))
@@ -31,6 +33,7 @@ public class Reload {
                         configManager.reload();
                         teleportationSound.reload();
                         teleportationService.reload();
+                        teleportationCooldown.reload();
                         teleportationQueue.reload();
                         joinEvent.reload();
                         respawnEvent.reload();

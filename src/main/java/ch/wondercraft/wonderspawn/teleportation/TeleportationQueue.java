@@ -37,7 +37,7 @@ public class TeleportationQueue{
         for (UUID id : uuidWaitInfoMap.keySet()){
             WaitInfo waitInfo = uuidWaitInfoMap.get(id);
             WaitInfo.State state = waitInfo.tick();
-            uuidBossBarMap.get(id).tick(waitInfo.remainingTick(), waitInfo.waitTicks);
+            uuidBossBarMap.get(id).tick(waitInfo.remainingTick(), waitInfo.waitTicks, waitInfo.canMove);
             if (state== WaitInfo.State.DONE){
                 uuidWaitInfoMap.remove(id);
                 waitInfo.player.hideBossBar(uuidBossBarMap.remove(id).bossBar);
@@ -51,12 +51,12 @@ public class TeleportationQueue{
             teleportationSound.play(player, TeleportationSound.Type.CANCELED);
             text.send(player,text.spawnCanceledPromise(waitTicks/20));
             uuidWaitInfoMap.get(player.getUniqueId()).update(waitTicks,canMove,waitOutCome);
-            uuidBossBarMap.get(player.getUniqueId()).tick(waitTicks,waitTicks);
+            uuidBossBarMap.get(player.getUniqueId()).tick(waitTicks,waitTicks,canMove);
         } else {
             teleportationSound.play(player, TeleportationSound.Type.INITIAL);
             text.send(player,text.spawnPromise(waitTicks/20));
             uuidWaitInfoMap.put(player.getUniqueId(), new WaitInfo(player,waitTicks,canMove,waitOutCome));
-            uuidBossBarMap.put(player.getUniqueId(),new BarTimer(player,waitTicks));
+            uuidBossBarMap.put(player.getUniqueId(),new BarTimer(player,waitTicks, canMove));
         }
         if (bossBarTimerActive) player.showBossBar(uuidBossBarMap.get(player.getUniqueId()).bossBar);
         return waitOutCome;
@@ -71,8 +71,8 @@ public class TeleportationQueue{
     }
 
     private static Data read(Plugin plugin){
-        ConfigChecker.warnIfMissing(plugin,"timer.text.active");
-        boolean textTimerActive = plugin.getConfig().getBoolean("timer.text.active");
+        ConfigChecker.warnIfMissing(plugin,"timer.chat.active");
+        boolean textTimerActive = plugin.getConfig().getBoolean("timer.chat.active");
         ConfigChecker.warnIfMissing(plugin,"timer.bossbar.active");
         boolean bossBarTimerActive = plugin.getConfig().getBoolean("timer.bossbar.active");
         ConfigChecker.warnIfMissing(plugin,"timer.bossbar.per-second-update");
@@ -124,7 +124,7 @@ public class TeleportationQueue{
             }
             if (elapsedTicks!=0 && remainingTick()%20==0 && remainingTick()!=0){
                 if (textTimerActive)
-                    text.send(player,text.chat(remainingTick()/20));
+                    text.send(player,text.chat(remainingTick()/20,canMove));
                 teleportationSound.play(player, TeleportationSound.Type.INTERVAL);
             }
             if (remainingTick()==0){
@@ -159,14 +159,14 @@ public class TeleportationQueue{
         private Player player;
         private BossBar bossBar;
 
-        private BarTimer(Player player, int waitTicks){
+        private BarTimer(Player player, int waitTicks, boolean canMove){
             this.player = player;
-            this.bossBar = BossBar.bossBar(text.bar(waitTicks/20),1f,bossBarTimerColor, BossBar.Overlay.PROGRESS,bossBarTimerFlags);
+            this.bossBar = BossBar.bossBar(text.bar(waitTicks/20,canMove),1f,bossBarTimerColor, BossBar.Overlay.PROGRESS,bossBarTimerFlags);
         }
 
-        private void tick(int remainingTicks, int waitTicks){
+        private void tick(int remainingTicks, int waitTicks, boolean canMove){
             if (remainingTicks%20==0)
-                bossBar.name(text.bar(remainingTicks/20));
+                bossBar.name(text.bar(remainingTicks/20,canMove));
             if (!bossBarTimerPerSecondUpdate || remainingTicks % 20 == 0){
                 bossBar.progress(Math.max(0,(float)remainingTicks/waitTicks));
             }

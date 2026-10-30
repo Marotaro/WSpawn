@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.commands;
 
+import ch.wondercraft.wonderspawn.teleportation.TeleportationCooldown;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
 import ch.wondercraft.wonderspawn.text.Text;
@@ -15,22 +16,27 @@ import org.bukkit.entity.Player;
 
 public class Spawn {
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(Text text, TeleportationService teleportationService){
+    public static LiteralArgumentBuilder<CommandSourceStack> create(Text text, TeleportationService teleportationService, TeleportationCooldown teleportationCooldown){
         return Commands.literal("spawn").requires(commandSourceStack ->commandSourceStack.getSender().hasPermission("wspawn.spawn"))
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
                     if (sender instanceof Player player){
-                        teleportationService.request(player, teleportationService.getApplicableDelay(player), teleportationService.getPlayerCanMove(player)).thenAccept(
-                                teleportationOutCome -> {
-                                    if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                                        text.send(player,text.spawnConfirmation());
-                                    else if (teleportationOutCome==TeleportationOutCome.MOVED) {
-                                        text.send(player,text.spawnPlayerMoved());
-                                    } else if (teleportationOutCome==TeleportationOutCome.ERROR) {
-                                        text.send(player,text.spawnUnknownError());
+                        if (teleportationCooldown.canRequest(player)) {
+                            teleportationCooldown.add(player);
+                            teleportationService.request(player, teleportationService.getApplicableDelay(player), teleportationService.getPlayerCanMove(player)).thenAccept(
+                                    teleportationOutCome -> {
+                                        if (teleportationOutCome == TeleportationOutCome.SUCCESS)
+                                            text.send(player, text.spawnConfirmation());
+                                        else if (teleportationOutCome == TeleportationOutCome.MOVED) {
+                                            text.send(player, text.spawnPlayerMoved());
+                                        } else if (teleportationOutCome == TeleportationOutCome.ERROR) {
+                                            text.send(player, text.spawnUnknownError());
+                                        }
                                     }
-                                }
-                        );
+                            );
+                        } else {
+                            text.send(player,text.cooldownDenied(teleportationCooldown.getRemainingTicks(player)/20));
+                        }
                         return Command.SINGLE_SUCCESS;
                     }
                     sender.sendMessage("need to be a player");
@@ -49,17 +55,20 @@ public class Spawn {
                                             Player target = res.getFirst();
                                             if (sender instanceof Player playerSender){
                                                 if (playerSender.equals(target)){
-                                                    teleportationService.request(playerSender, teleportationService.getApplicableDelay(playerSender), teleportationService.getPlayerCanMove(playerSender)).thenAccept(
-                                                            teleportationOutCome -> {
-                                                                if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                                                                    text.send(playerSender,text.spawnConfirmation());
-                                                                else if (teleportationOutCome==TeleportationOutCome.MOVED) {
-                                                                    text.send(playerSender,text.spawnPlayerMoved());
-                                                                } else if (teleportationOutCome==TeleportationOutCome.ERROR) {
-                                                                    text.send(playerSender,text.spawnUnknownError());
+                                                    if (teleportationCooldown.canRequest(playerSender))
+                                                        teleportationService.request(playerSender, teleportationService.getApplicableDelay(playerSender), teleportationService.getPlayerCanMove(playerSender)).thenAccept(
+                                                                teleportationOutCome -> {
+                                                                    if (teleportationOutCome== TeleportationOutCome.SUCCESS)
+                                                                        text.send(playerSender,text.spawnConfirmation());
+                                                                    else if (teleportationOutCome==TeleportationOutCome.MOVED) {
+                                                                        text.send(playerSender,text.spawnPlayerMoved());
+                                                                    } else if (teleportationOutCome==TeleportationOutCome.ERROR) {
+                                                                        text.send(playerSender,text.spawnUnknownError());
+                                                                    }
                                                                 }
-                                                            }
-                                                    );
+                                                        );
+                                                    else
+                                                        text.send(playerSender,text.cooldownDenied(teleportationCooldown.getRemainingTicks(playerSender)/20));
                                                 } else {
                                                     teleportationService.request(target).thenAccept(teleportationOutCome -> {
                                                         if (teleportationOutCome==TeleportationOutCome.SUCCESS){

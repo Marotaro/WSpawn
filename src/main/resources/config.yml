@@ -25,10 +25,15 @@ teleportation:
   # Countdown before the teleport, in ticks (20 ticks = 1 second, so 100 = 5 s)
   # Used when the player has no wspawn.teleportation.delay.<ticks> permission
   # Players with wspawn.teleportation.delay.bypass skip the countdown entirely
-  default-tick-delay: 100
+
   # If a player has several wspawn.teleportation.delay.<ticks> permissions:
   # true = use the longest delay, false = use the shortest one
-  use-max-delay: false
+  delay:
+    default-tick: 100
+    use-max: false
+  cooldown:
+    default-tick: 100
+    use-max: false
   # Allow players to move during the countdown
   # (the wspawn.teleportation.move permission allows it regardless of this value)
   default-can-move: false
@@ -44,7 +49,7 @@ teleportation:
 # ──────────────────────────────────────────────
 timer:
   # Show the remaining time as text
-  text:
+  chat:
     active: true
   # Show the remaining time as a boss bar
   bossbar:

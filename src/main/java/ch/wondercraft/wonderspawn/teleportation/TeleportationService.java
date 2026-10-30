@@ -35,13 +35,13 @@ public class TeleportationService {
     }
 
     private void read(){
-        ConfigChecker.warnIfMissing(plugin,"teleportation.default-tick-delay");
-        this.defaultWaitTicks = plugin.getConfig().getInt("teleportation.default-tick-delay");
+        ConfigChecker.warnIfMissing(plugin,"teleportation.delay.default-tick");
+        this.defaultWaitTicks = plugin.getConfig().getInt("teleportation.delay.default-tick");
         ConfigChecker.warnIfMissing(plugin,"teleportation.default-can-move");
         this.defaultCanMove = plugin.getConfig().getBoolean("teleportation.default-can-move");
-        ConfigChecker.warnIfMissing(plugin,"teleportation.use-max-delay");
-        this.useMaxDelay = plugin.getConfig().getBoolean("teleportation.use-max-delay");
-        ConfigChecker.warnIfMissing(plugin,"teleportation.default-keep-fall-distance");
+        ConfigChecker.warnIfMissing(plugin,"teleportation.delay.use-max");
+        this.useMaxDelay = plugin.getConfig().getBoolean("teleportation.delay.use-max");
+        ConfigChecker.warnIfMissing(plugin,"teleportation.delay.use-max");
         this.defaultKeepFallDistance = plugin.getConfig().getBoolean("teleportation.default-keep-fall-distance");
         ConfigChecker.warnIfMissing(plugin,"teleportation.default-face-set-orientation");
         this.defaultFaceSetSpawnOrientation = plugin.getConfig().getBoolean("teleportation.default-face-set-orientation");
