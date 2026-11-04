@@ -6,9 +6,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.object.ObjectContents;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
 
 public class Text {
     private  MiniMessage mm = MiniMessage.builder().build();
@@ -40,12 +43,22 @@ public class Text {
         }
     }
 
+    public void send(Player player, Component component){
+        if (!PlainTextComponentSerializer.plainText().serialize(component).isBlank()){
+            player.sendMessage(component);
+        }
+    }
+
     private Component textWithRemainingSecond(int remainingSecond, String key){
         return build(key,Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond)));
     }
 
     public Component spawnPromise(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"spawn.self.promise");
+        return textWithRemainingSecond(remainingSecond,"spawn.self.countdown-start");
+    }
+
+    public Component spawnCanceledPromise(int remainingSecond){
+        return textWithRemainingSecond(remainingSecond,"spawn.self.countdown-restart");
     }
 
     public Component spawnPlayerMoved(){
@@ -56,29 +69,46 @@ public class Text {
         return build("spawn.self.confirmation");
     }
 
+    public Component spawnUnknownError(){return build("spawn.self.error.unknown");}
+
     public Component forcedSpawnNotice(CommandSender sender){
-        return build("spawn.forced.target",
+        return build("spawn.forced.target.console",
                 Placeholder.unparsed("sender",sender.getName())
+                );
+    }
+
+    public Component forcedSpawnNotice(Player sender){
+        return build("spawn.forced.target.player",
+                Placeholder.unparsed("sender",sender.getName()),
+                Placeholder.component("head",Component.object(ObjectContents.playerHead(sender.getUniqueId())))
                 );
     }
 
     public Component forcedSpawnConfirmation(Player target){
         return build("spawn.forced.sender",
-                Placeholder.unparsed("target",target.getName())
+                Placeholder.unparsed("target",target.getName()),
+                Placeholder.component("head",Component.object(ObjectContents.playerHead(target.getName())))
         );
     }
 
     public Component forcedSpawnTryMoreThanOne(){
-        return build("spawn.forced.error.more-than-one");
+        return build("spawn.forced.error.multiple-targets");
     }
 
+    public Component barCanMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.bossbar.can-move");}
 
-    public Component bar(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"timer.bar");
+    public Component barCannotMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.bossbar.cannot-move");}
+
+    public Component bar(int remainingSecond, boolean canMove){
+        return (canMove)? barCanMove(remainingSecond): barCannotMove(remainingSecond);
     }
 
-    public Component chat(int remainingSecond){
-        return textWithRemainingSecond(remainingSecond,"timer.chat");
+    public Component chatCanMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.chat.can-move");}
+
+    public Component chatCanNotMove(int remainingSecond){return textWithRemainingSecond(remainingSecond,"timer.chat.cannot-move");}
+
+    public Component chat(int remainingSecond, boolean canMove){
+        return (canMove)? chatCanMove(remainingSecond): chatCanNotMove(remainingSecond);
     }
 
     public Component setSpawnConfirmation(Location oldLocation){
@@ -93,11 +123,17 @@ public class Text {
     }
 
     public Component setSpawnNeedsVerboseVersion(){
-        return build("set-spawn.error.needs-verbose");
+        return build("set-spawn.error.console-needs-coordinates");
+    }
+
+    public Component cooldownDenied(int remainingSecond){
+        return build("spawn.cooldown",
+                Placeholder.unparsed("remaining-second",String.valueOf(remainingSecond))
+                );
     }
 
     public Component reloadPromise(){
-        return build("reload.promise");
+        return build("reload.start");
     }
 
     public Component reloadConfirmation(){
@@ -105,10 +141,20 @@ public class Text {
     }
 
     public Component reloadFailed(ConfigManager.ConfigException e){
-        return build("reload.error.bad",
+        return build("reload.error.failed",
                 Placeholder.unparsed("error-file",e.getFileName()),
                 Placeholder.unparsed("error-message",e.getMessage())
                 );
     }
+
+    public Component onJoinTeleportation(){return build("events.on-join");}
+
+    public Component onFirstJoinTeleportation(){return build("events.on-first-join");}
+
+    public Component onRespawnBlockMissing(){return build("events.on-respawn-block-missing");}
+
+    public Component onRespawnOverrideBed(){return build("events.on-respawn-override-bed");}
+
+    public Component onRespawnOverrideAnchor(){return build("events.on-respawn-override-anchor");}
 
 }
