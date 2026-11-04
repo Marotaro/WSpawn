@@ -1,4 +1,8 @@
-# WSpawn
+<p align="center">
+  <img src="assets/logo.png" alt="WSpawn logo" width="200">
+</p>
+
+<h1 align="center">WSpawn</h1>
 
 A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for the [Wondercraft](https://wondercraft.ch) network.
 
@@ -8,7 +12,7 @@ A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for 
 - Force-teleport other players to the spawn
 - Automatic teleport on join and on respawn (when the bed or respawn anchor is missing)
 - Countdown shown in chat and/or in a boss bar
-- Configurable sounds for every step of the teleport
+- Configurable sounds for every step of the teleport, including custom sounds from a resource pack (e.g. `mypack:teleport.whoosh`)
 - Fully translatable messages, formatted with [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
 - Per-player delay and cooldown through permissions
 
@@ -55,6 +59,10 @@ If a player has several delay (or cooldown) permissions, `use-max` in `config.ym
 
 - `config.yml`: language, automatic teleports, delay/cooldown, countdown display, sounds.
 - `<lang>.yml` (e.g. `en.yml`): all messages. The language is selected with the `lang` option.
+
+### Sounds
+
+Each step of the teleport (`initial`, `interval`, `final`, `canceled`, `error`) has its own sound in the `sounds` section of `config.yml`. Use any name suggested by Minecraft's `/playsound` command (e.g. `minecraft:block.note_block.pling`), or a custom sound added through a resource pack (e.g. `mypack:teleport.whoosh`). Set `name: ""` to mute a sound.
 
 ### Creating your own language
 
