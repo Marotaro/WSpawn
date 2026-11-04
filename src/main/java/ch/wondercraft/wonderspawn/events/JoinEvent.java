@@ -41,19 +41,22 @@ public class JoinEvent implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        if (player.hasPlayedBefore())
-            if (teleportOnJoin){
+        boolean test = player.hasPlayedBefore();
+        System.out.println(test);
+        if (test) {
+            if (teleportOnJoin) {
                 teleportationService.request(player).thenAccept(teleportationOutCome -> {
-                    if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                        text.send(player,text.onJoinTeleportation());
+                    if (teleportationOutCome == TeleportationOutCome.SUCCESS)
+                        text.send(player, text.onJoinTeleportation());
                 });
             }
-        else
-            if (teleportOnFirstJoin){
+        } else {
+            if (teleportOnFirstJoin) {
                 teleportationService.request(player).thenAccept(teleportationOutCome -> {
-                    if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                        text.send(player,text.onFirstJoinTeleportation());
+                    if (teleportationOutCome == TeleportationOutCome.SUCCESS)
+                        text.send(player, text.onFirstJoinTeleportation());
                 });
             }
+        }
     }
 }
