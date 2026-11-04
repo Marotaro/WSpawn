@@ -1,98 +1,61 @@
 # WSpawn
 
-A somewhat customizable spawn plugin for [Paper](https://papermc.io/) servers, made for the [Wondercraft](https://wondercraft.ch) network.
+A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for the [Wondercraft](https://wondercraft.ch) network.
 
 ## Features
 
-- Teleport to the server spawn with `/spawn`
-- Configurable teleportation countdown, with a boss bar timer
-- Per-player delays through permissions
-- Cancel or allow movement during the countdown
-- Staff tools to set the spawn and send other players to it
-- Configurable sounds for each step of the teleport, including custom resource pack sounds
-- Fully customizable messages in MiniMessage format (no per player language (for now))
-- Reload the configs with `/wspawn reload`, no restart needed
+- `/spawn` with a configurable countdown, cooldown and cancel-on-move
+- Force-teleport other players to the spawn
+- Automatic teleport on join and on respawn (when the bed or respawn anchor is missing)
+- Countdown shown in chat and/or in a boss bar
+- Configurable sounds for every step of the teleport
+- Fully translatable messages, formatted with [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+- Per-player delay and cooldown through permissions
 
 ## Requirements
 
-- Paper `26.1.x` or higher
+- Paper (`api-version` 26.1.2)
 - Java version required by your Paper version
 
 ## Installation
 
 1. Download the latest jar from the [Releases](../../releases) page.
 2. Drop it in your server's `plugins/` folder.
-3. Restart the server.
-4. Edit `plugins/WSpawn/config.yml` to your liking.
+3. Start the server, then edit `plugins/WSpawn/config.yml` and the language file.
+4. Run `/wspawn reload` to apply changes.
 
 ## Commands
 
 | Command | Description | Permission |
 |---|---|---|
-| `/spawn` | Teleport yourself to spawn | `wspawn.spawn` |
-| `/spawn <player>` | Force a player to teleport to spawn | `wspawn.spawn.other` |
-| `/setspawn` | Set the server spawn to your position | `wspawn.set` |
-| `/wspawn:reload` | Reload the config and language files | `wspawn.reload` |
+| `/spawn` | Teleport yourself to the spawn | `wspawn.spawn` |
+| `/spawn <player>` | Force-teleport another player | `wspawn.spawn.other` |
+| `/setspawn` | Set the spawn at your position | `wspawn.set` |
+| `/wspawn reload` | Reload the configs | `wspawn.reload` |
 
 ## Permissions
 
 | Permission | Description | Default |
 |---|---|---|
-| `wspawn.spawn` | Teleport yourself to spawn | everyone |
-| `wspawn.spawn.other` | Force another player to teleport to spawn | op |
-| `wspawn.set` | Set the new spawn of the server | op |
-| `wspawn.teleportation.delay.bypass` | Skip the teleportation countdown | op |
+| `wspawn.spawn` | Teleport yourself to the spawn | everyone |
+| `wspawn.spawn.other` | Force-teleport another player | op |
+| `wspawn.set` | Set the server spawn | op |
+| `wspawn.reload` | Reload the plugin configs | op |
+| `wspawn.teleportation.delay.bypass` | Skip the countdown | op |
+| `wspawn.teleportation.delay.<ticks>` | Custom countdown (20 ticks = 1 s) | – |
+| `wspawn.teleportation.cooldown.bypass` | Skip the cooldown | – |
+| `wspawn.teleportation.cooldown.<ticks>` | Custom cooldown | – |
 | `wspawn.teleportation.move` | Allow moving during the countdown | op |
-| `wspawn.teleportation.delay.<ticks>` | Custom countdown for a player (in ticks) | none |
+| `wspawn.teleportation.keep-fall-distance` | Keep fall distance after teleport | – |
+| `wspawn.teleportation.face-set-orientation` | Face the spawn orientation | – |
 
-### Custom delays
-
-Give a player `wspawn.teleportation.delay.<ticks>` to override the default delay, for example `wspawn.teleportation.delay.40` for a 2-second countdown (20 ticks = 1 second).
-
-If a player has several of these permissions, `teleportation.use-min` decides which one applies: the smallest if `true`, the biggest if `false`. Without any of them, the default `teleportation.delay` is used.
-
-## Messages and languages
-
-All messages use [MiniMessage](https://docs.advntr.dev/minimessage/format.html). The active language is chosen with `lang` in `config.yml`, then apply it with `/wspawn reload`.
-
-To add a language, copy an existing language file, translate the values (keep the keys and `<placeholders>`), and set `lang` to its name.
-
-Global placeholders usable in every message: `<prefix>`, `<spawn-x>`, `<spawn-y>`, `<spawn-z>`, `<spawn-world>`, `<spawn-yaw>`, `<spawn-pitch>`. Each message also lists its own placeholders in the file.
-
-## Custom sounds
-
-Sound names are `namespace:path`. Vanilla sounds use `minecraft:`. For custom sounds, register your `.ogg` files in a resource pack's `sounds.json` and make players download it via `server.properties` (`resource-pack`, `resource-pack-sha1`, `require-resource-pack`). Then use your sound key as `name`.
+If a player has several delay (or cooldown) permissions, `use-max` in `config.yml` decides whether the longest or the shortest one applies.
 
 ## Configuration
 
-```yaml
-lang: "en"
+- `config.yml`: language, automatic teleports, delay/cooldown, countdown display, sounds.
+- `<lang>.yml` (e.g. `en.yml`): all messages. The language is selected with the `lang` option.
 
-teleportation:
-  # Default countdown in ticks (20 ticks = 1 second)
-  delay: 100
-  # Whether players may move during the countdown
-  default-can-move: false
-  # Several delay permissions: true = smallest, false = biggest
-  use-min: false
+### Creating your own language
 
-timer-display:
-  # Boss bar color: PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE
-  color: "BLUE"
-  active: true
-  # Update every second instead of every tick
-  per-second-update: true
-  # Boss bar flags, remove any you don't want
-  flag:
-    - DARKEN_SCREEN
-    - PLAY_BOSS_MUSIC
-    - CREATE_WORLD_FOG
-```
-
-## Building
-
-```bash
-./gradlew build
-```
-
-The jar is generated in `build/libs/`.
+Copy `en.yml`, translate the values only (keep the keys and `<placeholders>`), then set `lang` in `config.yml` and run `/wspawn reload`.
