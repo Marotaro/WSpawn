@@ -41,9 +41,7 @@ public class JoinEvent implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         Player player = event.getPlayer();
-        boolean test = player.hasPlayedBefore();
-        System.out.println(test);
-        if (test) {
+        if (player.hasPlayedBefore()) {
             if (teleportOnJoin) {
                 teleportationService.request(player).thenAccept(teleportationOutCome -> {
                     if (teleportationOutCome == TeleportationOutCome.SUCCESS)
