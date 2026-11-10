@@ -14,6 +14,7 @@ A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for 
 - Countdown shown in chat and/or in a boss bar
 - Configurable sounds for every step of the teleport, including custom sounds from a resource pack (e.g. `mypack:teleport.whoosh`)
 - Fully translatable messages, formatted with [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
+- Per-player language: each player gets the messages in their own game language, with a fallback for missing entries (can be forced to a single language for everyone)
 - Per-player delay and cooldown through permissions
 
 ## Requirements
@@ -58,12 +59,24 @@ If a player has several delay (or cooldown) permissions, `use-max` in `config.ym
 ## Configuration
 
 - `config.yml`: language, automatic teleports, delay/cooldown, countdown display, sounds.
-- `<lang>.yml` (e.g. `en.yml`): all messages. The language is selected with the `lang` option.
+- `lang/<language>.yml` (e.g. `en.yml`, `fr.yml`, `fr_ch.yml`): all messages. Players see the file matching their game language; `language.default` in `config.yml` is used for the console and for players whose language has no file.
 
 ### Sounds
 
 Each step of the teleport (`initial`, `interval`, `final`, `canceled`, `error`) has its own sound in the `sounds` section of `config.yml`. Use any name suggested by Minecraft's `/playsound` command (e.g. `minecraft:block.note_block.pling`), or a custom sound added through a resource pack (e.g. `mypack:teleport.whoosh`). Set `name: ""` to mute a sound.
 
-### Creating your own language
+### Languages
 
-Copy `en.yml`, translate the values only (keep the keys and `<placeholders>`), then set `lang` in `config.yml` and run `/wspawn reload`.
+Messages are sent in each player's game language (e.g. a player using `fr_CH` gets `fr_ch.yml`, then `fr.yml`). If no file matches, the file selected by `language.default` in `config.yml` is used, and the built-in `en.yml` as a last resort. The console always uses the default language.
+
+To use a single language for everyone, set `language.force: true` in `config.yml`: every player then gets the default language, whatever their game language.
+
+```yaml
+language:
+  default: "en"
+  force: false
+```
+
+A language file doesn't have to be complete: any missing entry falls back to the default language, then to the built-in one.
+
+To add a language, copy `en.yml` into `plugins/WSpawn/lang/`, name it after the language (`de.yml`, `fr.yml`, `fr_ch.yml`...), translate the values only (keep the keys and `<placeholders>`), then run `/wspawn reload`.
