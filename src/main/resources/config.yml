@@ -2,9 +2,13 @@
 #  General
 # ──────────────────────────────────────────────
 
-# Language file used by the plugin (e.g. "en")
+# Language
 language:
+  # Language used for the console and for players whose game language has no file
+  # in the lang/ folder (e.g. "en", "fr", "fr_ch"). Missing entries fall back to the
+  # built-in en.yml, see the header of the language files.
   default: "en"
+  # true = ignore the players' game language and use the default language for everyone
   force: false
 
 # ──────────────────────────────────────────────
