@@ -1,6 +1,5 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
-import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Bukkit;

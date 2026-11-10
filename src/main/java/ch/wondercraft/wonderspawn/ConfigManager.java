@@ -1,7 +1,5 @@
 package ch.wondercraft.wonderspawn;
 
-import ch.wondercraft.wonderspawn.text.Text;
-import ch.wondercraft.wonderspawn.text.TextString;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 

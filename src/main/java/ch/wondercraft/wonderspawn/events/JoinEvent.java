@@ -2,7 +2,6 @@ package ch.wondercraft.wonderspawn.events;
 
 import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
-import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

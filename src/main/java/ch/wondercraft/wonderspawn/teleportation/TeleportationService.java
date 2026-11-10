@@ -1,6 +1,5 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
-import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
 import io.papermc.paper.math.Rotation;

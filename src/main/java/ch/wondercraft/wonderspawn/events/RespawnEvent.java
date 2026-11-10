@@ -1,9 +1,7 @@
 package ch.wondercraft.wonderspawn.events;
 
-import ch.wondercraft.wonderspawn.text.Text;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
-import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

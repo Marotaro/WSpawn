@@ -1,7 +1,6 @@
 package ch.wondercraft.wonderspawn.commands;
 
 import ch.wondercraft.wonderspawn.SpawnLocation;
-import ch.wondercraft.wonderspawn.text.Text;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
