@@ -3,6 +3,7 @@ package ch.wondercraft.wonderspawn.commands;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationCooldown;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
+import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -15,7 +16,7 @@ import org.bukkit.entity.Player;
 
 public class Spawn {
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(Text text, TeleportationService teleportationService, TeleportationCooldown teleportationCooldown){
+    public static LiteralArgumentBuilder<CommandSourceStack> create(ComponentCreator componentCreator, TeleportationService teleportationService, TeleportationCooldown teleportationCooldown){
         return Commands.literal("spawn").requires(commandSourceStack ->commandSourceStack.getSender().hasPermission("wspawn.spawn"))
                 .executes(context -> {
                     CommandSender sender = context.getSource().getSender();
@@ -25,16 +26,16 @@ public class Spawn {
                             teleportationService.request(player, teleportationService.getApplicableDelay(player), teleportationService.getPlayerCanMove(player)).thenAccept(
                                     teleportationOutCome -> {
                                         if (teleportationOutCome == TeleportationOutCome.SUCCESS)
-                                            text.send(player, text.spawnConfirmation());
+                                            componentCreator.send(player, componentCreator.spawnConfirmation(player));
                                         else if (teleportationOutCome == TeleportationOutCome.MOVED) {
-                                            text.send(player, text.spawnPlayerMoved());
+                                            componentCreator.send(player, componentCreator.spawnPlayerMoved(player));
                                         } else if (teleportationOutCome == TeleportationOutCome.ERROR) {
-                                            text.send(player, text.spawnUnknownError());
+                                            componentCreator.send(player, componentCreator.spawnUnknownError(player));
                                         }
                                     }
                             );
                         } else {
-                            text.send(player,text.cooldownDenied(teleportationCooldown.getRemainingTicks(player)/20));
+                            componentCreator.send(player,componentCreator.cooldownDenied(player,teleportationCooldown.getRemainingTicks(player)/20));
                         }
                         return Command.SINGLE_SUCCESS;
                     }
@@ -48,7 +49,7 @@ public class Spawn {
                                             PlayerSelectorArgumentResolver resolver = context.getArgument("player", PlayerSelectorArgumentResolver.class);
                                             var res = resolver.resolve(context.getSource());
                                             if (res.size()!=1){
-                                                sender.sendMessage(text.forcedSpawnTryMoreThanOne());
+                                                sender.sendMessage(componentCreator.forcedSpawnTryMoreThanOne(sender));
                                                 return Command.SINGLE_SUCCESS;
                                             }
                                             Player target = res.getFirst();
@@ -58,35 +59,35 @@ public class Spawn {
                                                         teleportationService.request(playerSender, teleportationService.getApplicableDelay(playerSender), teleportationService.getPlayerCanMove(playerSender)).thenAccept(
                                                                 teleportationOutCome -> {
                                                                     if (teleportationOutCome== TeleportationOutCome.SUCCESS)
-                                                                        text.send(playerSender,text.spawnConfirmation());
+                                                                        componentCreator.send(playerSender,componentCreator.spawnConfirmation(playerSender));
                                                                     else if (teleportationOutCome==TeleportationOutCome.MOVED) {
-                                                                        text.send(playerSender,text.spawnPlayerMoved());
+                                                                        componentCreator.send(playerSender,componentCreator.spawnPlayerMoved(playerSender));
                                                                     } else if (teleportationOutCome==TeleportationOutCome.ERROR) {
-                                                                        text.send(playerSender,text.spawnUnknownError());
+                                                                        componentCreator.send(playerSender,componentCreator.spawnUnknownError(playerSender));
                                                                     }
                                                                 }
                                                         );
                                                     else
-                                                        text.send(playerSender,text.cooldownDenied(teleportationCooldown.getRemainingTicks(playerSender)/20));
+                                                        componentCreator.send(playerSender,componentCreator.cooldownDenied(playerSender,teleportationCooldown.getRemainingTicks(playerSender)/20));
                                                 } else {
                                                     teleportationService.request(target).thenAccept(teleportationOutCome -> {
                                                         if (teleportationOutCome==TeleportationOutCome.SUCCESS){
-                                                            text.send(playerSender,text.forcedSpawnConfirmation(target));
-                                                            text.send(target,text.forcedSpawnNotice(playerSender));
+                                                            componentCreator.send(playerSender,componentCreator.forcedSpawnConfirmation(playerSender,target));
+                                                            componentCreator.send(target,componentCreator.forcedSpawnNotice(target,playerSender));
                                                         } else {
-                                                            text.send(playerSender,text.spawnUnknownError());
-                                                            text.send(target,text.spawnUnknownError());
+                                                            componentCreator.send(playerSender,componentCreator.spawnUnknownError(playerSender));
+                                                            componentCreator.send(target,componentCreator.spawnUnknownError(target));
                                                         }
                                                     });
                                                 }
                                             } else {
                                                 teleportationService.request(target).thenAccept(teleportationOutCome -> {
                                                     if (teleportationOutCome==TeleportationOutCome.SUCCESS){
-                                                        text.send(target,text.forcedSpawnNotice(sender));
-                                                        sender.sendMessage(text.forcedSpawnConfirmation(target));
+                                                        componentCreator.send(target,componentCreator.forcedSpawnNotice(sender, target));
+                                                        sender.sendMessage(componentCreator.forcedSpawnConfirmation(sender,target));
                                                     } else {
-                                                        text.send(target,text.spawnUnknownError());
-                                                        sender.sendMessage(text.spawnUnknownError());
+                                                        componentCreator.send(target,componentCreator.spawnUnknownError(target));
+                                                        sender.sendMessage(componentCreator.spawnUnknownError(sender));
                                                     }
                                                 });
                                             }

@@ -7,6 +7,7 @@ import ch.wondercraft.wonderspawn.teleportation.TeleportationCooldown;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationQueue;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationSound;
+import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -21,12 +22,13 @@ public class Reload {
                                                                     TeleportationService teleportationService,
                                                                     TeleportationQueue  teleportationQueue,
                                                                     TeleportationCooldown teleportationCooldown,
+                                                                    ComponentCreator componentCreator,
                                                                     JoinEvent joinEvent,
                                                                     RespawnEvent respawnEvent){
         return Commands.literal("wspawn").then(Commands.literal("reload").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.reload"))
                 .executes(context -> {
                     CommandSender commandSender = context.getSource().getSender();
-                    commandSender.sendMessage(configManager.text().reloadPromise());
+                    commandSender.sendMessage(componentCreator.reloadPromise(commandSender));
                     try {
                         plugin.reloadConfig();
                         configManager.reload();
@@ -34,11 +36,12 @@ public class Reload {
                         teleportationService.reload();
                         teleportationCooldown.reload();
                         teleportationQueue.reload();
+                        componentCreator.reload();
                         joinEvent.reload();
                         respawnEvent.reload();
-                        commandSender.sendMessage(configManager.text().reloadConfirmation());
+                        commandSender.sendMessage(componentCreator.reloadConfirmation(commandSender));
                     } catch (ConfigManager.ConfigException e) {
-                        commandSender.sendMessage(configManager.text().reloadFailed(e));
+                        commandSender.sendMessage(componentCreator.reloadFailed(commandSender));
                     }
                     return Command.SINGLE_SUCCESS;
                 }));

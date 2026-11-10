@@ -4,13 +4,22 @@
 # Format: MiniMessage (https://docs.advntr.dev/minimessage/format.html)
 #
 # Language
-#   The language file in use is selected with the "lang" option in config.yml.
-#   Change it there, then run /wspawn reload.
-#   Only one language is active at a time for the whole server (no per-player language).
+#   Each player gets the messages in their game language (e.g. fr_ch.yml, then fr.yml).
+#   "language.default" in config.yml is used for the console and for players whose
+#   language has no file. Change it there, then run /wspawn reload.
 #
 # Creating your own language
-#   Copy this file with all its entries, translate the values only
-#   (keep the keys and the <placeholders> unchanged), then select it in config.yml.
+#   Copy this file, name it after the language (fr.yml, de.yml, fr_ch.yml...),
+#   translate the values only (keep the keys and the <placeholders> unchanged).
+#
+# Entries fallback
+#   A language file doesn't have to contain every entry. An entry is taken from:
+#     1. the player's language file (fr_ch.yml, then fr.yml)
+#     2. the file selected by "language.default" in config.yml
+#     3. the built-in en.yml inside the plugin (not editable, not the one in the "lang" folder)
+#   Useful tip: if you want a single prefix for all languages, define it only in the
+#   default language file and leave it out of the others. If it isn't found there
+#   either, the built-in one is used.
 #
 # Empty messages
 #   Any message set to "" is simply not sent (no chat message, no error).

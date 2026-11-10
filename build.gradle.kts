@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "ch.wondercraft.loanm"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     maven {
@@ -15,7 +15,6 @@ repositories {
 dependencies {
     dependencies {
         compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
-        compileOnly("net.luckperms:api:5.5")
     }
 }
 

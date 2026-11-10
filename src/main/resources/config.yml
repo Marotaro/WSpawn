@@ -3,7 +3,9 @@
 # ──────────────────────────────────────────────
 
 # Language file used by the plugin (e.g. "en")
-lang: "en"
+language:
+  default: "en"
+  force: false
 
 # ──────────────────────────────────────────────
 #  Automatic teleports
