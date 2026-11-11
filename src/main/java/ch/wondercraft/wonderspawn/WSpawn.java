@@ -44,8 +44,10 @@ public class WSpawn extends JavaPlugin implements Listener {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
             commands.register(Spawn.create(componentCreator,teleportationService,teleportationCooldown).build());
-            commands.register(SetSpawn.create(spawnLocation,componentCreator).build());
-            commands.register(Reload.create(this,teleportationSound,teleportationService,teleportationQueue,teleportationCooldown, componentCreator,joinEvent,respawnEvent).build());
+            commands.register(Commands.literal("wspawn")
+                    .then(SetSpawn.create(spawnLocation,componentCreator))
+                    .then(Reload.create(this,teleportationSound,teleportationService,teleportationQueue,teleportationCooldown, componentCreator,joinEvent,respawnEvent))
+                    .build());
         });
         this.getServer().getPluginManager().registerEvents(joinEvent,this);
         this.getServer().getPluginManager().registerEvents(respawnEvent, this);

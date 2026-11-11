@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 
 public class SetSpawn {
     public static LiteralArgumentBuilder<CommandSourceStack> create(SpawnLocation spawnLocation, ComponentCreator componentCreator){
-        return Commands.literal("setspawn").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.setspawn"))
+        return Commands.literal("set").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.set"))
                 .executes(context -> {
                     CommandSender commandSender = context.getSource().getSender();
                     if (commandSender instanceof Player player){

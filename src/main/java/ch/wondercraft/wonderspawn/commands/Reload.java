@@ -24,7 +24,7 @@ public class Reload {
                                                                     ComponentCreator componentCreator,
                                                                     JoinEvent joinEvent,
                                                                     RespawnEvent respawnEvent){
-        return Commands.literal("wspawn").then(Commands.literal("reload").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.reload"))
+        return Commands.literal("reload").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.reload"))
                 .executes(context -> {
                     CommandSender commandSender = context.getSource().getSender();
                     commandSender.sendMessage(componentCreator.reloadPromise(commandSender));
@@ -42,6 +42,6 @@ public class Reload {
                         commandSender.sendMessage(componentCreator.reloadFailed(commandSender, e));
                     }
                     return Command.SINGLE_SUCCESS;
-                }));
+                });
     }
 }
