@@ -15,14 +15,14 @@ import java.util.*;
 public class MessageLanguage {
     private static final String BUILTIN = "en";
     //update as new languages are supported by default
-    private static final String[] BUNDLED = {"en.yml","fr.yml"};
+    private static final String[] BUNDLED = {};
     private static final String LANGUAGE_FOLDER = "lang";
     private final Plugin plugin;
     private final Map<String, Map<String, String>> languages = new HashMap<>();
     private final Map<String,String> builtIn = new HashMap<>();
     private String defaultLang = BUILTIN;
     private boolean forceLang = false;
-    private boolean generateBundled = true;
+    private boolean generateBundled = false;
 
 
     private MessageLanguage(Plugin plugin){
@@ -60,8 +60,6 @@ public class MessageLanguage {
     }
 
     private void load() {
-        ConfigChecker.warnIfMissing(plugin,"language.generate-bundled");
-        this.generateBundled = plugin.getConfig().getBoolean("language.generate-bundled");
         //loading built-in messages
         InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(plugin.getResource(LANGUAGE_FOLDER + "/" + BUILTIN + ".yml")), StandardCharsets.UTF_8);
         YamlConfiguration builtInLanguageConf = YamlConfiguration.loadConfiguration(reader);
