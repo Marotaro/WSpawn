@@ -22,6 +22,7 @@ public class MessageLanguage {
     private final Map<String,String> builtIn = new HashMap<>();
     private String defaultLang = BUILTIN;
     private boolean forceLang = false;
+    private boolean generateBundled = true;
 
 
     private MessageLanguage(Plugin plugin){
@@ -59,6 +60,8 @@ public class MessageLanguage {
     }
 
     private void load() {
+        ConfigChecker.warnIfMissing(plugin,"language.generate-bundled");
+        this.generateBundled = plugin.getConfig().getBoolean("language.generate-bundled");
         //loading built-in messages
         InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(plugin.getResource(LANGUAGE_FOLDER + "/" + BUILTIN + ".yml")), StandardCharsets.UTF_8);
         YamlConfiguration builtInLanguageConf = YamlConfiguration.loadConfiguration(reader);
@@ -66,21 +69,23 @@ public class MessageLanguage {
         //generating bundled languages if needed
         File languageFolder = new File(plugin.getDataFolder(),LANGUAGE_FOLDER);
         if (languageFolder.mkdirs()) plugin.getLogger().info("Languages folder was created.");
-        plugin.getLogger().info("Creating bundled language files if missing:");
         boolean created = false;
-        for (String name: BUNDLED){
-            File file = new File(languageFolder,name);
-            if (!file.exists()) {
-                try {
-                    plugin.saveResource(LANGUAGE_FOLDER+"/"+name,true);
-                    plugin.getLogger().info("\t"+name+" created.");
-                    created = true;
-                } catch (IllegalArgumentException e) {
-                    plugin.getLogger().severe("Missing language in plugin resources but still in bundled... ignoring.");
+        if (generateBundled) {
+            plugin.getLogger().info("Creating bundled language files if missing:");
+            for (String name : BUNDLED) {
+                File file = new File(languageFolder, name);
+                if (!file.exists()) {
+                    try {
+                        plugin.saveResource(LANGUAGE_FOLDER + "/" + name, true);
+                        plugin.getLogger().info("\t" + name + " created.");
+                        created = true;
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().severe("Missing language in plugin resources but still in bundled... ignoring.");
+                    }
                 }
             }
         }
-        plugin.getLogger().info((created)? "Bundled language file(s) created." : "No bundled language files created.");
+        plugin.getLogger().info((created)? "Bundled language file(s) created." : (generateBundled)? "No bundled language files were created." : "Bundled languages are disabled.");
         read();
     }
 

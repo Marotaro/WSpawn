@@ -4,7 +4,7 @@
 
 <h1 align="center">WSpawn</h1>
 
-A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for the [Wondercraft](https://wondercraft.ch) network.
+A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for the WonderCraft network.
 
 ## Features
 
@@ -15,6 +15,7 @@ A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for 
 - Configurable sounds for every step of the teleport, including custom sounds from a resource pack (e.g. `mypack:teleport.whoosh`)
 - Fully translatable messages, formatted with [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
 - Per-player language: each player gets the messages in their own game language, with a fallback for missing entries (can be forced to a single language for everyone)
+- Bundled languages, with an optional lightweight jar without them
 - Per-player delay and cooldown through permissions
 
 ## Compatibility
@@ -85,15 +86,19 @@ language:
   default: "en"
   # true = ignore the players' game language and use the default language for everyone
   force: false
+  # true = copy the bundled languages into the lang/ folder on startup
+  # false = don't generate them (saves space, only your own files are used)(+ won't delete existing files)
+  # needs to restart the server to apply a change.
+  generate-bundled: true
 
 # ──────────────────────────────────────────────
 #  Automatic teleports
 # ──────────────────────────────────────────────
 events:
   # Teleport players to spawn the first time they join
-  on-first-join: false
+  on-first-join: true
   # Teleport players to spawn every time they join (first join excluded)
-  on-join: true
+  on-join: false
   respawn:
     if-missing: true
     override-bed: false
@@ -193,12 +198,6 @@ Each step of the teleport (`initial`, `interval`, `final`, `canceled`, `error`) 
 Messages are sent in each player's game language (e.g. a player using `fr_CH` gets `fr_ch.yml`, then `fr.yml`). If no file matches, the file selected by `language.default` in `config.yml` is used, and the built-in `en.yml` as a last resort. The console always uses the default language.
 
 To use a single language for everyone, set `language.force: true` in `config.yml`: every player then gets the default language, whatever their game language.
-
-```yaml
-language:
-  default: "en"
-  force: false
-```
 
 A language file doesn't have to be complete: any missing entry falls back to the default language, then to the built-in one.
 
@@ -343,5 +342,25 @@ events:
   # Sent when a player with a respawn anchor is sent to the spawn instead
   on-respawn-override-anchor: "<prefix><green>You were teleported to spawn, but you still have an respawn anchor active."
 ```
-
 </details>
+
+### Bundled languages
+
+WSpawn ships with the following languages:
+
+| Language | File | Author   |
+|---|---|----------|
+| English | `en.yml` | Marotaro |
+| Français | `fr.yml` | Marotaro |
+
+
+On first start they are copied into `plugins/WSpawn/lang/`, where you can edit them freely.
+
+Bundled languages are copied into `plugins/WSpawn/lang/` on startup when `language.generate-bundled` is `true`, where you can edit them freely. Changing this option requires a server restart (`/wspawn reload` is not enough), and existing files are never deleted.
+
+Your language is missing? Send me your translation (open an issue or a pull request with the translated file) and I'll add it to a future release.
+
+Bundled languages make the jar a bit bigger. To save space you can:
+
+- download the **no-bundled** version from the [Releases](../../releases) page, which only contains the built-in `en.yml` (used as the last fallback);
+- or keep the regular jar and set `language.generate-bundled: false` in `config.yml`, so the bundled languages are not copied into `lang/`.

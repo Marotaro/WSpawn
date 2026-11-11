@@ -10,15 +10,19 @@ language:
   default: "en"
   # true = ignore the players' game language and use the default language for everyone
   force: false
+  # true = copy the bundled languages into the lang/ folder on startup
+  # false = don't generate them (saves space, only your own files are used)(+ won't delete existing files)
+  # needs to restart the server to apply a change.
+  generate-bundled: true
 
 # ──────────────────────────────────────────────
 #  Automatic teleports
 # ──────────────────────────────────────────────
 events:
   # Teleport players to spawn the first time they join
-  on-first-join: false
+  on-first-join: true
   # Teleport players to spawn every time they join (first join excluded)
-  on-join: true
+  on-join: false
   respawn:
     if-missing: true
     override-bed: false
