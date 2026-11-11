@@ -16,8 +16,11 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.Time;
+import java.util.Timer;
+
 public class WSpawn extends JavaPlugin implements Listener {
-    private ConfigManager configManager = new ConfigManager(this);
+    private SpawnLocation spawnLocation;
     private TeleportationService teleportationService;
     private TeleportationQueue teleportationQueue;
     private TeleportationCooldown teleportationCooldown;
@@ -28,35 +31,30 @@ public class WSpawn extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable(){
-        this.configManager = new ConfigManager(this);
-        try {
-            configManager.load();
-        } catch (ConfigManager.ConfigException e){
-            getLogger().severe("Config invalid -> "+e.getMessage());
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        this.componentCreator = ComponentCreator.load(this,configManager.spawnLocation());
+        long start = System.currentTimeMillis();
+        ConfigManager.create(this);
+        this.spawnLocation = SpawnLocation.load(this);
+        this.componentCreator = ComponentCreator.load(this,spawnLocation);
         this.teleportationSound = TeleportationSound.load(this);
         this.teleportationQueue = TeleportationQueue.load(this, componentCreator,teleportationSound);
         this.teleportationCooldown = TeleportationCooldown.load(this);
-        this.teleportationService = new TeleportationService(this,componentCreator,configManager.spawnLocation(),teleportationQueue,teleportationSound);
+        this.teleportationService = new TeleportationService(this,componentCreator,spawnLocation,teleportationQueue,teleportationSound);
         this.joinEvent = new JoinEvent(this,teleportationService, componentCreator);
-        this.respawnEvent = new RespawnEvent(this,configManager.spawnLocation(),componentCreator);
+        this.respawnEvent = new RespawnEvent(this,spawnLocation,componentCreator);
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
             commands.register(Spawn.create(componentCreator,teleportationService,teleportationCooldown).build());
-            commands.register(SetSpawn.create(configManager.spawnLocation(),componentCreator).build());
-            commands.register(Reload.create(this,configManager,teleportationSound,teleportationService,teleportationQueue,teleportationCooldown, componentCreator,joinEvent,respawnEvent).build());
+            commands.register(SetSpawn.create(spawnLocation,componentCreator).build());
+            commands.register(Reload.create(this,teleportationSound,teleportationService,teleportationQueue,teleportationCooldown, componentCreator,joinEvent,respawnEvent).build());
         });
-
         this.getServer().getPluginManager().registerEvents(joinEvent,this);
         this.getServer().getPluginManager().registerEvents(respawnEvent, this);
+        long finish = System.currentTimeMillis();
+        this.getLogger().info("Done in "+Long.toString(finish-start,4)+"ms.");
     }
 
     @Override
     public void onDisable(){
-        if (configManager.spawnLocation() !=null)
-            configManager.spawnLocation().save();
+        spawnLocation.save();
     }
 }

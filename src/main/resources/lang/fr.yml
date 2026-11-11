@@ -28,7 +28,7 @@ reload:
   start: "<prefix><green>Rechargement des configurations..."
   confirmation: "<prefix><green>Configurations rechargées avec succès."
   error:
-    failed: "<prefix><red>Une erreur est survenue lors du rechargement de <white><error-file><red> : <white><error-message><red>."
+    failed: "<prefix><red>Une erreur est survenue lors du rechargement de <red> : <white><error><red>."
 
 timer:
   bossbar:

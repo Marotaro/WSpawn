@@ -97,7 +97,7 @@ reload:
   error:
     # Sent when a config file fails to load
     # Placeholders: <error-file> <error-message>
-    failed: "<prefix><red>Something went wrong while reloading <white><error-file><red>: <white><error-message><red>."
+    failed: "<prefix><red>Something went wrong while reloading <red>: <white><error><red>."
 
 # ──────────────────────────────────────────────
 #  Countdown display

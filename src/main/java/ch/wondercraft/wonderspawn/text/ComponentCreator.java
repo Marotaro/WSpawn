@@ -146,10 +146,9 @@ public class ComponentCreator {
         return build(sender, "reload.confirmation");
     }
 
-    public Component reloadFailed(CommandSender sender){
+    public Component reloadFailed(CommandSender sender, Exception e){
         return build(sender, "reload.error.failed",
-                Placeholder.unparsed("error-file", ""),
-                Placeholder.unparsed("error-message", "")
+                Placeholder.unparsed("error", e.getMessage())
         );
     }
 

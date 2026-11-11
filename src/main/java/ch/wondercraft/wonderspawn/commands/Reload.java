@@ -17,7 +17,6 @@ import org.bukkit.plugin.Plugin;
 
 public class Reload {
     public static LiteralArgumentBuilder<CommandSourceStack> create(Plugin plugin,
-                                                                    ConfigManager configManager,
                                                                     TeleportationSound teleportationSound,
                                                                     TeleportationService teleportationService,
                                                                     TeleportationQueue  teleportationQueue,
@@ -31,7 +30,6 @@ public class Reload {
                     commandSender.sendMessage(componentCreator.reloadPromise(commandSender));
                     try {
                         plugin.reloadConfig();
-                        configManager.reload();
                         teleportationSound.reload();
                         teleportationService.reload();
                         teleportationCooldown.reload();
@@ -40,8 +38,8 @@ public class Reload {
                         joinEvent.reload();
                         respawnEvent.reload();
                         commandSender.sendMessage(componentCreator.reloadConfirmation(commandSender));
-                    } catch (ConfigManager.ConfigException e) {
-                        commandSender.sendMessage(componentCreator.reloadFailed(commandSender));
+                    } catch (Exception e) {
+                        commandSender.sendMessage(componentCreator.reloadFailed(commandSender, e));
                     }
                     return Command.SINGLE_SUCCESS;
                 }));

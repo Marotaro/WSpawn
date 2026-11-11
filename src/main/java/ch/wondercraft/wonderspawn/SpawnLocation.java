@@ -3,6 +3,7 @@ package ch.wondercraft.wonderspawn;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -10,16 +11,30 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
 public class SpawnLocation extends Location {
+    private final static String SPAWN_FILE_NAME = "spawnLocation.yml";
+    private final Plugin plugin;
     private final File spawnFile;
 
-    private SpawnLocation(Location location, File spawnFile){
-        this.spawnFile = spawnFile;
-        super(location.getWorld(),location.getX(),location.getY(),location.getZ(),location.getYaw(),location.getPitch());
+    private SpawnLocation(Plugin plugin){
+        this.plugin = plugin;
+        this.spawnFile = new File(plugin.getDataFolder(),SPAWN_FILE_NAME);
+        Location initLoc = plugin.getServer().getRespawnWorld().getSpawnLocation();
+        super(initLoc.getWorld(), initLoc.x(), initLoc.y(), initLoc.z());
+        update(read());
+        plugin.getLogger().info("Loading SpawnLocation.");
     }
 
-    private static Location read(@NotNull File spawnFile) throws NoSuchFileException,IllegalArgumentException {
+    private Location read(){
         if (!spawnFile.exists()){
-            throw new NoSuchFileException("spawnLocation does not exist");
+            try {
+                spawnFile.createNewFile();
+                YamlConfiguration spawnLocationConfig = YamlConfiguration.loadConfiguration(spawnFile);
+                spawnLocationConfig.set("spawn-location",plugin.getServer().getRespawnWorld().getSpawnLocation());
+                spawnLocationConfig.save(spawnFile);
+                plugin.getLogger().info("Creating spawn location file with default world as default.");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         Location location = YamlConfiguration.loadConfiguration(spawnFile).getLocation("spawn-location");
@@ -29,8 +44,8 @@ public class SpawnLocation extends Location {
         return location;
     }
 
-    public static SpawnLocation load(@NotNull File spawnFile) throws NoSuchFileException,IllegalArgumentException{
-        return new SpawnLocation(read(spawnFile),spawnFile);
+    public static SpawnLocation load(Plugin plugin){
+        return new SpawnLocation(plugin);
     }
 
     public void update(@NotNull Location l){
@@ -50,7 +65,9 @@ public class SpawnLocation extends Location {
         }
     }
 
-    public void reload() throws NoSuchFileException,IllegalArgumentException{
-        this.update(read(this.spawnFile));
+    public void reload(){
+        this.save();
+        this.update(read());
+        plugin.getLogger().info("reloading SpawnLocation.");
     }
 }

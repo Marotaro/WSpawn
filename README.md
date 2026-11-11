@@ -48,7 +48,7 @@ A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for 
 | `wspawn.reload` | Reload the plugin configs | op |
 | `wspawn.teleportation.delay.bypass` | Skip the countdown | op |
 | `wspawn.teleportation.delay.<ticks>` | Custom countdown (20 ticks = 1 s) | – |
-| `wspawn.teleportation.cooldown.bypass` | Skip the cooldown | – |
+| `wspawn.teleportation.cooldown.bypass` | Skip the cooldown | op |
 | `wspawn.teleportation.cooldown.<ticks>` | Custom cooldown | – |
 | `wspawn.teleportation.move` | Allow moving during the countdown | op |
 | `wspawn.teleportation.keep-fall-distance` | Keep fall distance after teleport | – |
