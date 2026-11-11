@@ -1,7 +1,7 @@
 package ch.wondercraft.wonderspawn.commands;
 
 import ch.wondercraft.wonderspawn.SpawnLocation;
-import ch.wondercraft.wonderspawn.text.Text;
+import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -15,16 +15,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SetSpawn {
-    public static LiteralArgumentBuilder<CommandSourceStack> create(SpawnLocation spawnLocation, Text text){
-        return Commands.literal("setspawn").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.setspawn"))
+    public static LiteralArgumentBuilder<CommandSourceStack> create(SpawnLocation spawnLocation, ComponentCreator componentCreator){
+        return Commands.literal("set").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.set"))
                 .executes(context -> {
                     CommandSender commandSender = context.getSource().getSender();
                     if (commandSender instanceof Player player){
                         Location oldLocation = spawnLocation.clone();
                         spawnLocation.update(player.getLocation());
-                        player.sendMessage(text.setSpawnConfirmation(oldLocation));
+                        player.sendMessage(componentCreator.setSpawnConfirmation(player,oldLocation));
                     } else {
-                        commandSender.sendMessage(text.setSpawnNeedsVerboseVersion());
+                        commandSender.sendMessage(componentCreator.setSpawnNeedsVerboseVersion(commandSender));
                     }
                     return Command.SINGLE_SUCCESS;
                 }).then(
@@ -46,7 +46,7 @@ public class SetSpawn {
                                                     );
                                             Location oldLocation = spawnLocation.clone();
                                             spawnLocation.update(newLocation);
-                                            commandSender.sendMessage(text.setSpawnConfirmation(oldLocation));
+                                            commandSender.sendMessage(componentCreator.setSpawnConfirmation(commandSender, oldLocation));
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 )

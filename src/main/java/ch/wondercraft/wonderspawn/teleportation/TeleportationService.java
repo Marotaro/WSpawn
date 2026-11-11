@@ -1,6 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
-import ch.wondercraft.wonderspawn.text.Text;
+import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
 import io.papermc.paper.math.Rotation;
@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class TeleportationService {
     private Location spawnLocation;
-    private Text text;
+    private ComponentCreator componentCreator;
     private Plugin plugin;
     private TeleportationQueue teleportationQueue;
     private int defaultWaitTicks;
@@ -23,12 +23,12 @@ public class TeleportationService {
     private boolean defaultFaceSetSpawnOrientation;
     private TeleportationSound teleportationSound;
 
-    public TeleportationService(Plugin plugin, Text text, Location spawnLocation, TeleportationQueue teleportationQueue,
+    public TeleportationService(Plugin plugin, ComponentCreator componentCreator, Location spawnLocation, TeleportationQueue teleportationQueue,
                                 TeleportationSound teleportationSound){
         this.plugin = plugin;
         plugin.getLogger().info("Loading TeleportationService");
         read();
-        this.text = text;
+        this.componentCreator = componentCreator;
         this.spawnLocation = spawnLocation;
         this.teleportationQueue = teleportationQueue;
         this.teleportationSound = teleportationSound;

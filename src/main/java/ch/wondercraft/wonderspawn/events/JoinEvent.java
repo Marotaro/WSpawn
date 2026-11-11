@@ -2,7 +2,7 @@ package ch.wondercraft.wonderspawn.events;
 
 import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
-import ch.wondercraft.wonderspawn.text.Text;
+import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,15 +13,15 @@ import org.bukkit.plugin.Plugin;
 public class JoinEvent implements Listener {
     private final Plugin plugin;
     private final TeleportationService teleportationService;
-    private final Text text;
+    private final ComponentCreator componentCreator;
     boolean teleportOnFirstJoin;
     boolean teleportOnJoin;
 
-    public JoinEvent(Plugin plugin, TeleportationService teleportationService, Text text){
+    public JoinEvent(Plugin plugin, TeleportationService teleportationService, ComponentCreator componentCreator){
         this.plugin = plugin;
         plugin.getLogger().info("loading JoinEvent");
         this.teleportationService = teleportationService;
-        this.text = text;
+        this.componentCreator = componentCreator;
         read(plugin);
     }
     private void read(Plugin plugin){
@@ -45,14 +45,14 @@ public class JoinEvent implements Listener {
             if (teleportOnJoin) {
                 teleportationService.request(player).thenAccept(teleportationOutCome -> {
                     if (teleportationOutCome == TeleportationOutCome.SUCCESS)
-                        text.send(player, text.onJoinTeleportation());
+                        componentCreator.send(player, componentCreator.onJoinTeleportation(player));
                 });
             }
         } else {
             if (teleportOnFirstJoin) {
                 teleportationService.request(player).thenAccept(teleportationOutCome -> {
                     if (teleportationOutCome == TeleportationOutCome.SUCCESS)
-                        text.send(player, text.onFirstJoinTeleportation());
+                        componentCreator.send(player, componentCreator.onFirstJoinTeleportation(player));
                 });
             }
         }

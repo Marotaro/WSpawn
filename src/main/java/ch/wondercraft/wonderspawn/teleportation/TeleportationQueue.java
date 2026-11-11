@@ -1,6 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
-import ch.wondercraft.wonderspawn.text.Text;
+import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.Bukkit;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class TeleportationQueue{
     private final Plugin plugin;
-    private final Text text;
+    private final ComponentCreator componentCreator;
     private final TeleportationSound teleportationSound;
     private final Map<UUID,WaitInfo> uuidWaitInfoMap = new ConcurrentHashMap<>();
     private final Map<UUID, BarTimer> uuidBossBarMap = new ConcurrentHashMap<>();
@@ -25,9 +25,9 @@ public class TeleportationQueue{
     private BossBar.Color bossBarTimerColor;
     private Set<BossBar.Flag> bossBarTimerFlags;
 
-    private TeleportationQueue(Plugin plugin, Text text,TeleportationSound teleportationSound,Data data){
+    private TeleportationQueue(Plugin plugin, ComponentCreator componentCreator,TeleportationSound teleportationSound,Data data){
         this.plugin = plugin;
-        this.text = text;
+        this.componentCreator = componentCreator;
         this.teleportationSound = teleportationSound;
         apply(data);
         Bukkit.getScheduler().runTaskTimer(plugin,this::tickAll,0L,1L);
@@ -49,12 +49,12 @@ public class TeleportationQueue{
         CompletableFuture<WaitInfo.WaitOutCome> waitOutCome = new CompletableFuture<>();
         if (uuidWaitInfoMap.containsKey(player.getUniqueId())){
             teleportationSound.play(player, TeleportationSound.Type.CANCELED);
-            text.send(player,text.spawnCanceledPromise(waitTicks/20));
+            componentCreator.send(player,componentCreator.spawnCanceledPromise(player,waitTicks/20));
             uuidWaitInfoMap.get(player.getUniqueId()).update(waitTicks,canMove,waitOutCome);
             uuidBossBarMap.get(player.getUniqueId()).tick(waitTicks,waitTicks,canMove);
         } else {
             teleportationSound.play(player, TeleportationSound.Type.INITIAL);
-            text.send(player,text.spawnPromise(waitTicks/20));
+            componentCreator.send(player,componentCreator.spawnPromise(player,waitTicks/20));
             uuidWaitInfoMap.put(player.getUniqueId(), new WaitInfo(player,waitTicks,canMove,waitOutCome));
             uuidBossBarMap.put(player.getUniqueId(),new BarTimer(player,waitTicks, canMove));
         }
@@ -84,9 +84,9 @@ public class TeleportationQueue{
         return new Data(textTimerActive,bossBarTimerActive,bossBarTimerPerSecondUpdate,bossBarTimerColor,bossBarTimerFlags);
     }
 
-    public static TeleportationQueue load(Plugin plugin, Text text, TeleportationSound teleportationSound){
+    public static TeleportationQueue load(Plugin plugin, ComponentCreator componentCreator, TeleportationSound teleportationSound){
         plugin.getLogger().info("loading TeleportationQueue");
-        return new TeleportationQueue(plugin,text,teleportationSound,read(plugin));
+        return new TeleportationQueue(plugin,componentCreator,teleportationSound,read(plugin));
     }
 
     public void reload(){
@@ -124,7 +124,7 @@ public class TeleportationQueue{
             }
             if (elapsedTicks!=0 && remainingTick()%20==0 && remainingTick()!=0){
                 if (textTimerActive)
-                    text.send(player,text.chat(remainingTick()/20,canMove));
+                    componentCreator.send(player,componentCreator.chat(player,remainingTick()/20,canMove));
                 teleportationSound.play(player, TeleportationSound.Type.INTERVAL);
             }
             if (remainingTick()==0){
@@ -161,12 +161,12 @@ public class TeleportationQueue{
 
         private BarTimer(Player player, int waitTicks, boolean canMove){
             this.player = player;
-            this.bossBar = BossBar.bossBar(text.bar(waitTicks/20,canMove),1f,bossBarTimerColor, BossBar.Overlay.PROGRESS,bossBarTimerFlags);
+            this.bossBar = BossBar.bossBar(componentCreator.bar(player,waitTicks/20,canMove),1f,bossBarTimerColor, BossBar.Overlay.PROGRESS,bossBarTimerFlags);
         }
 
         private void tick(int remainingTicks, int waitTicks, boolean canMove){
             if (remainingTicks%20==0)
-                bossBar.name(text.bar(remainingTicks/20,canMove));
+                bossBar.name(componentCreator.bar(player,remainingTicks/20,canMove));
             if (!bossBarTimerPerSecondUpdate || remainingTicks % 20 == 0){
                 bossBar.progress(Math.max(0,(float)remainingTicks/waitTicks));
             }

@@ -1,9 +1,8 @@
 package ch.wondercraft.wonderspawn.events;
 
-import ch.wondercraft.wonderspawn.text.Text;
+import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
-import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,15 +13,15 @@ import org.bukkit.plugin.Plugin;
 public class RespawnEvent implements Listener {
     private final Plugin plugin;
     private final Location spawnLocation;
-    private final Text text;
+    private final ComponentCreator componentCreator;
     private boolean defaultIfMissing = true;
     private boolean defaultOverRideBedRespawn = true;
     private boolean defaultOverRideAnchorRespawn;
 
-    public RespawnEvent(Plugin plugin, Location spawnLocation, Text text){
+    public RespawnEvent(Plugin plugin, Location spawnLocation, ComponentCreator componentCreator){
         this.plugin = plugin;
         this.spawnLocation = spawnLocation;
-        this.text = text;
+        this.componentCreator = componentCreator;
         plugin.getLogger().info("loading RespawnEvent");
         read(plugin);
     }
@@ -46,15 +45,15 @@ public class RespawnEvent implements Listener {
         Player player = event.getPlayer();
         if (event.isMissingRespawnBlock() && SimpleBooleanDefaultPerm.getter(player,"wspawn.event.respawn.block-missing",defaultIfMissing)){
             event.setRespawnLocation(spawnLocation);
-            text.send(player,text.onRespawnBlockMissing());
+            componentCreator.send(player,componentCreator.onRespawnBlockMissing(player));
         }
         else if (event.isBedSpawn() && SimpleBooleanDefaultPerm.getter(player,"wspawn.event.respawn.override-bed",defaultOverRideBedRespawn)){
             event.setRespawnLocation(spawnLocation);
-            text.send(player,text.onRespawnOverrideBed());
+            componentCreator.send(player,componentCreator.onRespawnOverrideBed(player));
         }
         else if (event.isAnchorSpawn() && SimpleBooleanDefaultPerm.getter(player,"wspawn.event.respawn.override-anchor",defaultOverRideAnchorRespawn)) {
             event.setRespawnLocation(spawnLocation);
-            text.send(player,text.onRespawnOverrideAnchor());
+            componentCreator.send(player,componentCreator.onRespawnOverrideAnchor(player));
         }
     }
 
