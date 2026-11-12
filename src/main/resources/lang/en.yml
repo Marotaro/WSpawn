@@ -96,7 +96,7 @@ reload:
   confirmation: "<prefix><green>Configs reloaded successfully."
   error:
     # Sent when a config file fails to load
-    # Placeholders: <error-file> <error-message>
+    # Placeholders: <error>
     failed: "<prefix><red>Something went wrong while reloading <red>: <white><error><red>."
 
 # ──────────────────────────────────────────────
