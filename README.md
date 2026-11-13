@@ -8,15 +8,14 @@ A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for 
 
 ## Features
 
-- `/spawn` with a configurable countdown, cooldown and cancel-on-move
+- `/spawn` with configurable countdown, cooldown and cancel-on-move, adjustable globally in the config and per player through permissions
 - Force-teleport other players to the spawn
 - Automatic teleport on join and on respawn (when the bed or respawn anchor is missing)
 - Countdown shown in chat and/or in a boss bar
-- Configurable sounds for every step of the teleport, including custom sounds from a resource pack (e.g. `mypack:teleport.whoosh`)
-- Fully translatable messages, formatted with [MiniMessage](https://docs.advntr.dev/minimessage/format.html)
-- Per-player language: each player gets the messages in their own game language, with a fallback for missing entries (can be forced to a single language for everyone)
-- Bundled languages, with an optional lightweight jar without them
-- Per-player delay and cooldown through permissions
+- Configurable sounds for every step of the teleport, including custom resource pack sounds (e.g. `mypack:teleport.whoosh`)
+- Per-player language: messages are sent in each player's own game language, with a fallback for missing entries (can be forced to a single language for everyone)
+- Fully translatable messages, formatted with MiniMessage
+- Bundled languages, with an optional lightweight version without them
 
 ## Compatibility
 
