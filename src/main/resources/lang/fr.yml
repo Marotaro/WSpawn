@@ -14,6 +14,7 @@ spawn:
       console: "<prefix><green>Tu as été téléporté au spawn par <white><sender><green>."
       player: "<prefix><green>Tu as été téléporté au spawn par <reset><head> <white><sender><green>."
     sender: "<prefix><green>Tu as téléporté <reset><head><white><target> <green>au spawn."
+    all: "<prefix><green>Tu as téléporté <white><total><green> joueur(s) au spawn."
     error:
       multiple-targets: "<prefix><red>Tu ne peux téléporter qu'un seul joueur à la fois."
 

@@ -10,6 +10,9 @@ permissions:
   wspawn.spawn.other:
     description: "force teleport an other to spawn"
     default: op
+  wspawn.spawn.exempt:
+    description: "exempt player to be forced teleport when all"
+    default: op
   wspawn.set:
     description: "set the new spawn of the server"
     default: op

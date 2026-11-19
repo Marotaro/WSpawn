@@ -10,11 +10,19 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Spawn {
+
+    private static final Logger log = LoggerFactory.getLogger(Spawn.class);
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(ComponentCreator componentCreator, TeleportationService teleportationService, TeleportationCooldown teleportationCooldown){
         return Commands.literal("spawn").requires(commandSourceStack ->commandSourceStack.getSender().hasPermission("wspawn.spawn"))
@@ -73,7 +81,7 @@ public class Spawn {
                                                     teleportationService.request(target).thenAccept(teleportationOutCome -> {
                                                         if (teleportationOutCome==TeleportationOutCome.SUCCESS){
                                                             componentCreator.send(playerSender,componentCreator.forcedSpawnConfirmation(playerSender,target));
-                                                            componentCreator.send(target,componentCreator.forcedSpawnNotice(target,playerSender));
+                                                            componentCreator.send(target,componentCreator.forcedSpawnNotice(playerSender,target));
                                                         } else {
                                                             componentCreator.send(playerSender,componentCreator.spawnUnknownError(playerSender));
                                                             componentCreator.send(target,componentCreator.spawnUnknownError(target));
@@ -94,6 +102,30 @@ public class Spawn {
                                             return Command.SINGLE_SUCCESS;
                                         }
                                 )
-                );
+                )
+                .then(Commands.literal("all").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.spawn.all")).executes(
+                        commandContext -> {
+                            CommandSender sender = commandContext.getSource().getSender();
+                            List<Player> connectedPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
+                            int total = connectedPlayers.size();
+                            for (Player player : connectedPlayers){
+                                if (player.hasPermission("wpsawn.spawn.exempt")|| (player.equals(sender))){
+                                    --total;
+                                    continue;
+                                } else {
+                                    teleportationService.request(player).thenAccept(teleportationOutCome -> {
+                                        if (teleportationOutCome==TeleportationOutCome.SUCCESS){
+                                            componentCreator.send(player,componentCreator.forcedSpawnNotice(sender,player));
+                                        } else {
+                                            componentCreator.send(player,componentCreator.spawnUnknownError(player));
+                                            sender.sendMessage(componentCreator.spawnUnknownError(sender));
+                                        }
+                                    });
+                                }
+                            }
+                            componentCreator.send(sender,componentCreator.forcedAllSpawnConfirmation(sender,total));
+                            return Command.SINGLE_SUCCESS;
+                        }
+                ));
     }
 }

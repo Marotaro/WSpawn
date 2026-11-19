@@ -119,6 +119,12 @@ public class ComponentCreator {
         return build(sender, "spawn.forced.error.multiple-targets");
     }
 
+    public Component forcedAllSpawnConfirmation(CommandSender sender, int total){
+        return build(sender, "spawn.forced.all",
+                Placeholder.unparsed("total",String.valueOf(total))
+                );
+    }
+
     // ── /setspawn ────────────────────────────────────────
 
     public Component setSpawnConfirmation(CommandSender sender, Location oldLocation){

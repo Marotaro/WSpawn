@@ -69,6 +69,9 @@ spawn:
     # Received by whoever ran the command
     # Placeholders: <head> <target>
     sender: "<prefix><green>You teleported <reset><head><white><target> <green>to the spawn."
+    # Received by whoever ran the command to tp all player to spawn
+    # Placeholder: <total> (number of players teleported to spawn)
+    all: "<prefix><green>You teleported <white><total> <green>player(s) to the spawn."
     error:
       # Sent when the command targets several players (e.g. @a or another selector)
       multiple-targets: "<prefix><red>You can only teleport one player at a time."
