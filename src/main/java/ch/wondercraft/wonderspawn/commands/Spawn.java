@@ -109,7 +109,7 @@ public class Spawn {
                             List<Player> connectedPlayers = new ArrayList<>(Bukkit.getOnlinePlayers());
                             int total = connectedPlayers.size();
                             for (Player player : connectedPlayers){
-                                if (player.hasPermission("wpsawn.spawn.exempt")|| (player.equals(sender))){
+                                if (player.hasPermission("wspawn.spawn.exempt")|| (player.equals(sender))){
                                     --total;
                                     continue;
                                 } else {
