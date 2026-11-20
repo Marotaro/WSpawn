@@ -27,6 +27,9 @@ events:
     if-missing: true
     override-bed: false
     override-anchor: false
+  on-void-fall:
+    active: false
+    keep-inventory: false
 
 # ──────────────────────────────────────────────
 #  Teleportation behaviour
@@ -41,9 +44,6 @@ teleportation:
   delay:
     default-tick: 100
     use-max: false
-  cooldown:
-    default-tick: 100
-    use-max: false
   # Allow players to move during the countdown
   # (the wspawn.teleportation.move permission allows it regardless of this value)
   default-can-move: false
@@ -53,6 +53,15 @@ teleportation:
   # Make the player face the orientation defined by the spawn point
   # (wspawn.teleportation.face-set-orientation overrides this value)
   default-face-set-orientation: true
+  # Same logic as "delay" but to prevent player for spamming the /spawn command
+  # Used when the player has no wspawn.teleportation.cooldown.<ticks> permission
+  # Player with wspawn.teleportation.cooldown.bypass skip the cooldown entirely
+
+  # if a player has several wspawn.teleportation.delay.<ticks> permissions:
+  # true = use the longest delay, false = use the shortest one
+  cooldown:
+    default-tick: 100
+    use-max: false
 
 # ──────────────────────────────────────────────
 #  Countdown display

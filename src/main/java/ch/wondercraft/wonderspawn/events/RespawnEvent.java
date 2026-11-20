@@ -15,8 +15,8 @@ public class RespawnEvent implements Listener {
     private final Location spawnLocation;
     private final ComponentCreator componentCreator;
     private boolean defaultIfMissing = true;
-    private boolean defaultOverRideBedRespawn = true;
-    private boolean defaultOverRideAnchorRespawn;
+    private boolean defaultOverRideBedRespawn = false;
+    private boolean defaultOverRideAnchorRespawn = false;
 
     public RespawnEvent(Plugin plugin, Location spawnLocation, ComponentCreator componentCreator){
         this.plugin = plugin;

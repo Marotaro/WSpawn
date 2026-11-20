@@ -53,6 +53,7 @@ public class SpawnLocation extends Location {
         set(l.getX(),l.getY(),l.getZ());
         setYaw(l.getYaw());
         setPitch(l.getPitch());
+        save();
     }
 
     public void save(){

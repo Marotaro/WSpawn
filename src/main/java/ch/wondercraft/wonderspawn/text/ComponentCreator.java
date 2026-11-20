@@ -186,7 +186,9 @@ public class ComponentCreator {
         return build(player, "events.on-respawn-override-bed");
     }
 
-    public Component onRespawnOverrideAnchor(Player player){
-        return build(player, "events.on-respawn-override-anchor");
-    }
+    public Component onRespawnOverrideAnchor(Player player){return build(player, "events.on-respawn-override-anchor");}
+
+    public Component onVoidFallKeep(Player player){ return  build(player, "events.on-void-fall.keep-inventory");}
+
+    public Component onVoidFallClear(Player player){ return  build(player, "events.on-void-fall.clear-inventory");}
 }

@@ -111,7 +111,6 @@ public class Spawn {
                             for (Player player : connectedPlayers){
                                 if (player.hasPermission("wspawn.spawn.exempt")|| (player.equals(sender))){
                                     --total;
-                                    continue;
                                 } else {
                                     teleportationService.request(player).thenAccept(teleportationOutCome -> {
                                         if (teleportationOutCome==TeleportationOutCome.SUCCESS){

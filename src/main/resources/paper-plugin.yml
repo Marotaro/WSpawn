@@ -31,3 +31,9 @@ permissions:
   wspawn.teleportation.cooldown.bypass:
     description: "let player bypass cooldown for new request"
     default: op
+  wspawn.voidfall.exempt:
+    description: "exempt player from automatic teleportation on void fall"
+    default: op
+  wspawn.voidfall.keep-inventory:
+    description: "let player keep their inventory when automatic teleportation on void fall"
+    default: false

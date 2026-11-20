@@ -3,6 +3,7 @@ package ch.wondercraft.wonderspawn.commands;
 import ch.wondercraft.wonderspawn.ConfigManager;
 import ch.wondercraft.wonderspawn.events.JoinEvent;
 import ch.wondercraft.wonderspawn.events.RespawnEvent;
+import ch.wondercraft.wonderspawn.events.VoidEvent;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationCooldown;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationQueue;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
@@ -23,7 +24,8 @@ public class Reload {
                                                                     TeleportationCooldown teleportationCooldown,
                                                                     ComponentCreator componentCreator,
                                                                     JoinEvent joinEvent,
-                                                                    RespawnEvent respawnEvent){
+                                                                    RespawnEvent respawnEvent,
+                                                                    VoidEvent voidEvent){
         return Commands.literal("reload").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.reload"))
                 .executes(context -> {
                     CommandSender commandSender = context.getSource().getSender();
@@ -37,6 +39,7 @@ public class Reload {
                         componentCreator.reload();
                         joinEvent.reload();
                         respawnEvent.reload();
+                        voidEvent.reload();
                         commandSender.sendMessage(componentCreator.reloadConfirmation(commandSender));
                     } catch (Exception e) {
                         commandSender.sendMessage(componentCreator.reloadFailed(commandSender, e));
