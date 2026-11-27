@@ -51,7 +51,7 @@ public class VoidEvent implements Listener, Reloadable {
     @EventHandler
     public void onVoidFall(EntityDamageEvent event){
         if (event.getEntity() instanceof Player player){
-            if (event.getCause()== EntityDamageEvent.DamageCause.VOID && SimpleBooleanDefaultPerm.getter(player,"wspawn.voidfall.exempt", isDefaultActive)){
+            if (event.getCause()== EntityDamageEvent.DamageCause.VOID && !SimpleBooleanDefaultPerm.getter(player,"wspawn.voidfall.exempt", !isDefaultActive)){
                 event.setCancelled(true);
                 boolean keepInventory = SimpleBooleanDefaultPerm.getter(player,"wspawn.voidfall.keep-inventory",isDefaultKeepInventory);
                 if (!keepInventory)
