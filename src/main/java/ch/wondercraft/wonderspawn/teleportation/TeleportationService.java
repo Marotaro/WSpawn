@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
+import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
@@ -11,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.CompletableFuture;
 
-public class TeleportationService {
+public class TeleportationService implements Reloadable {
     private Location spawnLocation;
     private ComponentCreator componentCreator;
     private Plugin plugin;
@@ -26,8 +27,7 @@ public class TeleportationService {
     public TeleportationService(Plugin plugin, ComponentCreator componentCreator, Location spawnLocation, TeleportationQueue teleportationQueue,
                                 TeleportationSound teleportationSound){
         this.plugin = plugin;
-        plugin.getLogger().info("Loading TeleportationService");
-        read();
+        load(plugin);
         this.componentCreator = componentCreator;
         this.spawnLocation = spawnLocation;
         this.teleportationQueue = teleportationQueue;
@@ -47,8 +47,15 @@ public class TeleportationService {
         this.defaultFaceSetSpawnOrientation = plugin.getConfig().getBoolean("teleportation.default-face-set-orientation");
     }
 
-    public void reload(){
-        plugin.getLogger().info("reloading TeleportationService");
+    @Override
+    public void load(Plugin plugin) {
+        Reloadable.super.load(plugin);
+        read();
+    }
+
+    @Override
+    public void reload(Plugin plugin) {
+        Reloadable.super.reload(plugin);
         read();
     }
 
@@ -59,10 +66,10 @@ public class TeleportationService {
             if (b) {
                 if (!getPlayerFaceSetOrientation(player)) player.setRotation(playerRotation.yaw(),playerRotation.pitch());
                 if (!getPlayerKeepFallDistance(player)) player.setFallDistance(0L);
-                teleportationSound.play(player, TeleportationSound.Type.FINAL);
+                teleportationSound.play(player, TeleportationSound.teleportationSoundType.FINAL);
                 future.complete(TeleportationOutCome.SUCCESS);
             } else {
-                teleportationSound.play(player, TeleportationSound.Type.ERROR);
+                teleportationSound.play(player, TeleportationSound.teleportationSoundType.ERROR);
                 future.complete(TeleportationOutCome.ERROR);
             }
         });
@@ -81,15 +88,15 @@ public class TeleportationService {
                     if (success){
                         if (!getPlayerFaceSetOrientation(player)) player.setRotation(playerRotation.yaw(),playerRotation.pitch());
                         if (!getPlayerKeepFallDistance(player)) player.setFallDistance(0L);
-                        teleportationSound.play(player, TeleportationSound.Type.FINAL);
+                        teleportationSound.play(player, TeleportationSound.teleportationSoundType.FINAL);
                         future.complete(TeleportationOutCome.SUCCESS);
                     } else {
-                        teleportationSound.play(player, TeleportationSound.Type.ERROR);
+                        teleportationSound.play(player, TeleportationSound.teleportationSoundType.ERROR);
                         future.complete(TeleportationOutCome.ERROR);
                     }
                 });
             } else if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.MOVED) {
-                teleportationSound.play(player, TeleportationSound.Type.ERROR);
+                teleportationSound.play(player, TeleportationSound.teleportationSoundType.ERROR);
                 future.complete(TeleportationOutCome.MOVED);
             } else if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.CANCELED) {
                 future.complete(TeleportationOutCome.CANCELED);

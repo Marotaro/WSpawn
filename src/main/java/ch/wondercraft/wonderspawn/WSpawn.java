@@ -35,11 +35,11 @@ public class WSpawn extends JavaPlugin implements Listener {
     public void onEnable(){
         long start = System.currentTimeMillis();
         ConfigManager.create(this);
-        this.spawnLocation = SpawnLocation.load(this);
-        this.componentCreator = ComponentCreator.load(this,spawnLocation);
-        this.teleportationSound = TeleportationSound.load(this);
-        this.teleportationQueue = TeleportationQueue.load(this, componentCreator,teleportationSound);
-        this.teleportationCooldown = TeleportationCooldown.load(this);
+        this.spawnLocation = new SpawnLocation(this);
+        this.componentCreator = new ComponentCreator(this,spawnLocation);
+        this.teleportationSound = new TeleportationSound(this);
+        this.teleportationQueue = new TeleportationQueue(this,componentCreator,teleportationSound);
+        this.teleportationCooldown = new TeleportationCooldown(this);
         this.teleportationService = new TeleportationService(this,componentCreator,spawnLocation,teleportationQueue,teleportationSound);
         this.joinEvent = new JoinEvent(this,teleportationService, componentCreator);
         this.respawnEvent = new RespawnEvent(this,spawnLocation,componentCreator);
@@ -49,7 +49,10 @@ public class WSpawn extends JavaPlugin implements Listener {
             commands.register(Spawn.create(componentCreator,teleportationService,teleportationCooldown).build());
             commands.register(Commands.literal("wspawn")
                     .then(SetSpawn.create(spawnLocation,componentCreator))
-                    .then(Reload.create(this,teleportationSound,teleportationService,teleportationQueue,teleportationCooldown, componentCreator,joinEvent,respawnEvent,voidEvent))
+                    .then(Reload.create(this,componentCreator,
+                            spawnLocation,componentCreator,teleportationSound,
+                            teleportationQueue,teleportationCooldown,teleportationService,
+                            joinEvent,respawnEvent,voidEvent))
                     .build());
         });
         this.getServer().getPluginManager().registerEvents(joinEvent,this);

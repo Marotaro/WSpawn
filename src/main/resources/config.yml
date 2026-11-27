@@ -118,3 +118,7 @@ sounds:
     name: "minecraft:entity.villager.no"
     volume: 1
     pitch: 1
+  void:
+    name: "minecraft:entity.villager.no"
+    volume: 1
+    pitch: 1

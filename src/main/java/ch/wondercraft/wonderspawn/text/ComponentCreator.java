@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.text;
 
+import ch.wondercraft.wonderspawn.Reloadable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -13,23 +14,27 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Locale;
 
-public class ComponentCreator {
+public class ComponentCreator implements Reloadable {
     private final Plugin plugin;
     private final MiniMessage miniMessage = MiniMessage.builder().build();
     private final Location spawnLocation;
     private final MessageLanguage messageLanguage;
 
-    private ComponentCreator(Plugin plugin, Location spawnLocation){
+    public ComponentCreator(Plugin plugin, Location spawnLocation){
         this.plugin = plugin;
+        load(plugin);
         this.spawnLocation = spawnLocation;
         messageLanguage = MessageLanguage.load(plugin);
     }
 
-    public static ComponentCreator load(Plugin plugin, Location spawnLocation){
-        return new ComponentCreator(plugin, spawnLocation);
+    @Override
+    public void load(Plugin plugin) {
+        Reloadable.super.load(plugin);
     }
 
-    public void reload(){
+    @Override
+    public void reload(Plugin plugin){
+        Reloadable.super.reload(plugin);
         messageLanguage.reload();
     }
 

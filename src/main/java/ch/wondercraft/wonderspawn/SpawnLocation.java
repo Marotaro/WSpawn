@@ -10,18 +10,17 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
-public class SpawnLocation extends Location {
+public class SpawnLocation extends Location implements Reloadable{
     private final static String SPAWN_FILE_NAME = "spawnLocation.yml";
     private final Plugin plugin;
     private final File spawnFile;
 
-    private SpawnLocation(Plugin plugin){
+    public SpawnLocation(Plugin plugin){
         this.plugin = plugin;
         this.spawnFile = new File(plugin.getDataFolder(),SPAWN_FILE_NAME);
         Location initLoc = plugin.getServer().getRespawnWorld().getSpawnLocation();
         super(initLoc.getWorld(), initLoc.x(), initLoc.y(), initLoc.z());
-        update(read());
-        plugin.getLogger().info("Loading SpawnLocation.");
+        load(plugin);
     }
 
     private Location read(){
@@ -44,8 +43,17 @@ public class SpawnLocation extends Location {
         return location;
     }
 
-    public static SpawnLocation load(Plugin plugin){
-        return new SpawnLocation(plugin);
+    @Override
+    public void load(Plugin plugin) {
+        Reloadable.super.load(plugin);
+        update(read());
+    }
+
+    @Override
+    public void reload(Plugin plugin) {
+        Reloadable.super.reload(plugin);
+        this.save();
+        this.update(read());
     }
 
     public void update(@NotNull Location l){
@@ -64,11 +72,5 @@ public class SpawnLocation extends Location {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void reload(){
-        this.save();
-        this.update(read());
-        plugin.getLogger().info("reloading SpawnLocation.");
     }
 }
