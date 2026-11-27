@@ -14,6 +14,7 @@ import ch.wondercraft.wonderspawn.teleportation.TeleportationSound;
 import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -34,6 +35,10 @@ public class WSpawn extends JavaPlugin implements Listener {
     @Override
     public void onEnable(){
         long start = System.currentTimeMillis();
+
+        int pluginId = 35715;
+        Metrics metrics = new Metrics(this,pluginId);
+
         ConfigManager.create(this);
         this.spawnLocation = new SpawnLocation(this);
         this.componentCreator = new ComponentCreator(this,spawnLocation);
