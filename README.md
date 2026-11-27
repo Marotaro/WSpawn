@@ -9,8 +9,8 @@ A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for 
 ## Features
 
 - `/spawn` with configurable countdown, cooldown and cancel-on-move, adjustable globally in the config and per player through permissions
-- Force-teleport other players to the spawn
-- Automatic teleport on join and on respawn (when the bed or respawn anchor is missing)
+- Force-teleport other players to the spawn, or everyone at once (players with `wspawn.spawn.exempt` are skipped)
+- Automatic teleport on join, on respawn (when the bed or respawn anchor is missing) and on void fall, with an option to keep the player's inventory
 - Countdown shown in chat and/or in a boss bar
 - Configurable sounds for every step of the teleport, including custom resource pack sounds (e.g. `mypack:teleport.whoosh`)
 - Per-player language: messages are sent in each player's own game language, with a fallback for missing entries (can be forced to a single language for everyone)
@@ -41,24 +41,29 @@ A somewhat customizable spawn plugin for [Paper](https://papermc.io/), made for 
 |---|---|---|
 | `/spawn` | Teleport yourself to the spawn | `wspawn.spawn` |
 | `/spawn <player>` | Force-teleport another player | `wspawn.spawn.other` |
+| `/spawn all` | Force-teleport all online players | `wspawn.spawn.all` |
 | `/wspawn set` | Set the spawn at your position | `wspawn.set` |
 | `/wspawn reload` | Reload the configs | `wspawn.reload` |
 
 ## Permissions
 
 | Permission | Description | Default |
-|---|---|---|
-| `wspawn.spawn` | Teleport yourself to the spawn | everyone |
-| `wspawn.spawn.other` | Force-teleport another player | op |
-| `wspawn.set` | Set the server spawn | op |
-| `wspawn.reload` | Reload the plugin configs | op |
-| `wspawn.teleportation.delay.bypass` | Skip the countdown | op |
-| `wspawn.teleportation.delay.<ticks>` | Custom countdown (20 ticks = 1 s) | – |
-| `wspawn.teleportation.cooldown.bypass` | Skip the cooldown | op |
-| `wspawn.teleportation.cooldown.<ticks>` | Custom cooldown | – |
-| `wspawn.teleportation.move` | Allow moving during the countdown | op |
-| `wspawn.teleportation.keep-fall-distance` | Keep fall distance after teleport | – |
-| `wspawn.teleportation.face-set-orientation` | Face the spawn orientation | – |
+|---|---|---------|
+| `wspawn.spawn` | Teleport yourself to the spawn | true    |
+| `wspawn.spawn.other` | Force-teleport another player | op      |
+| `wspawn.spawn.all` | Force-teleport all players to the spawn | op      |
+| `wspawn.spawn.exempt` | Not teleported when everyone is force-teleported | op      |
+| `wspawn.set` | Set the server spawn | op      |
+| `wspawn.reload` | Reload the plugin configs | op      |
+| `wspawn.teleportation.delay.bypass` | Skip the countdown | op      |
+| `wspawn.teleportation.delay.<ticks>` | Custom countdown (20 ticks = 1 s) | –       |
+| `wspawn.teleportation.cooldown.bypass` | Skip the cooldown | op      |
+| `wspawn.teleportation.cooldown.<ticks>` | Custom cooldown | –       |
+| `wspawn.teleportation.move` | Allow moving during the countdown | op      |
+| `wspawn.teleportation.keep-fall-distance` | Keep fall distance after teleport | –       |
+| `wspawn.teleportation.face-set-orientation` | Face the spawn orientation | –       |
+| `wspawn.voidfall.exempt` | Not teleported on void fall | op      |
+| `wspawn.voidfall.keep-inventory` | Keep the inventory when teleported on void fall | false   |
 
 If a player has several delay (or cooldown) permissions, `use-max` in `config.yml` decides whether the longest or the shortest one applies.
 
@@ -102,6 +107,9 @@ events:
     if-missing: true
     override-bed: false
     override-anchor: false
+  on-void-fall:
+    active: false
+    keep-inventory: false
 
 # ──────────────────────────────────────────────
 #  Teleportation behaviour
@@ -116,9 +124,6 @@ teleportation:
   delay:
     default-tick: 100
     use-max: false
-  cooldown:
-    default-tick: 100
-    use-max: false
   # Allow players to move during the countdown
   # (the wspawn.teleportation.move permission allows it regardless of this value)
   default-can-move: false
@@ -128,6 +133,15 @@ teleportation:
   # Make the player face the orientation defined by the spawn point
   # (wspawn.teleportation.face-set-orientation overrides this value)
   default-face-set-orientation: true
+  # Same logic as "delay" but to prevent player for spamming the /spawn command
+  # Used when the player has no wspawn.teleportation.cooldown.<ticks> permission
+  # Player with wspawn.teleportation.cooldown.bypass skip the cooldown entirely
+
+  # If a player has several wspawn.teleportation.cooldown.<ticks> permissions:
+  # true = use the longest delay, false = use the shortest one
+  cooldown:
+    default-tick: 100
+    use-max: false
 
 # ──────────────────────────────────────────────
 #  Countdown display
@@ -184,13 +198,18 @@ sounds:
     name: "minecraft:entity.villager.no"
     volume: 1
     pitch: 1
+  # Played when a player is teleported after falling into the void
+  void:
+    name: "minecraft:ambient.cave"
+    volume: 1
+    pitch: 1.8
 ```
 
 </details>
 
 ### Sounds
 
-Each step of the teleport (`initial`, `interval`, `final`, `canceled`, `error`) has its own sound in the `sounds` section of `config.yml`. Use any name suggested by Minecraft's `/playsound` command (e.g. `minecraft:block.note_block.pling`), or a custom sound added through a resource pack (e.g. `mypack:teleport.whoosh`). Set `name: ""` to mute a sound.
+Each step of the teleport (`initial`, `interval`, `final`, `canceled`, `error`, `void`) has its own sound in the `sounds` section of `config.yml`. Use any name suggested by Minecraft's `/playsound` command (e.g. `minecraft:block.note_block.pling`), or a custom sound added through a resource pack (e.g. `mypack:teleport.whoosh`). Set `name: ""` to mute a sound.
 
 ### Languages
 
@@ -277,6 +296,9 @@ spawn:
     # Received by whoever ran the command
     # Placeholders: <head> <target>
     sender: "<prefix><green>You teleported <reset><head><white><target> <green>to the spawn."
+    # Received by whoever ran the command to tp all player to spawn
+    # Placeholder: <total> (number of players teleported to spawn)
+    all: "<prefix><green>You teleported <white><total> <green>player(s) to the spawn."
     error:
       # Sent when the command targets several players (e.g. @a or another selector)
       multiple-targets: "<prefix><red>You can only teleport one player at a time."
@@ -286,7 +308,7 @@ spawn:
   # Placeholders: <remaining-second>
   cooldown: "<prefix><green>You are on cooldown for <white><remaining-second><green>s."
 
-# /setspawn
+# /wspawn reload
 # Here <spawn-*> is the NEW location, and <old-*> is the previous one.
 set-spawn:
   # Sent after the spawn is changed
@@ -304,8 +326,8 @@ reload:
   confirmation: "<prefix><green>Configs reloaded successfully."
   error:
     # Sent when a config file fails to load
-    # Placeholders: <error-file> <error-message>
-    failed: "<prefix><red>Something went wrong while reloading <red>: <white><error><red>."
+    # Placeholders: <error>
+    failed: "<prefix><red>Something went wrong while reloading: <white><error><red>."
 
 # ──────────────────────────────────────────────
 #  Countdown display
@@ -335,11 +357,17 @@ events:
   on-first-join: ""
   # Sent when a player respawns at the spawn because their respawn block
   # (bed or respawn anchor) is missing or was destroyed
-  on-respawn-block-missing: "<prefix><green>You were teleported to spawn because you are missing an respawn point."
+  on-respawn-block-missing: "<prefix><green>You were teleported to spawn because you are missing a respawn point."
   # Sent when a player with a bed respawn point is sent to the spawn instead
   on-respawn-override-bed: "<prefix><green>You were teleported to spawn, but you still have a bed placed and accessible."
   # Sent when a player with a respawn anchor is sent to the spawn instead
-  on-respawn-override-anchor: "<prefix><green>You were teleported to spawn, but you still have an respawn anchor active."
+  on-respawn-override-anchor: "<prefix><green>You were teleported to spawn, but you still have a respawn anchor active."
+  # Sent when a player falls into the void and is teleported to the spawn
+  on-void-fall:
+    # ...with their inventory kept
+    keep-inventory: "<prefix><green>You fell into the void and were teleported to the spawn. Your inventory was kept."
+    # ...with their inventory cleared
+    clear-inventory: "<prefix><red>You fell into the void and were teleported to the spawn. Your inventory was cleared."
 ```
 </details>
 
@@ -352,8 +380,6 @@ WSpawn ships with the following languages:
 | English | `en.yml` | Marotaro |
 | Français | `fr.yml` | Marotaro |
 
-
-On first start they are copied into `plugins/WSpawn/lang/`, where you can edit them freely.
 
 Bundled languages are copied into `plugins/WSpawn/lang/` on startup when `language.generate-bundled` is `true`, where you can edit them freely. Changing this option requires a server restart (`/wspawn reload` is not enough), and existing files are never deleted.
 

@@ -53,7 +53,7 @@ teleportation:
   # Used when the player has no wspawn.teleportation.cooldown.<ticks> permission
   # Player with wspawn.teleportation.cooldown.bypass skip the cooldown entirely
 
-  # if a player has several wspawn.teleportation.delay.<ticks> permissions:
+  # If a player has several wspawn.teleportation.cooldown.<ticks> permissions:
   # true = use the longest delay, false = use the shortest one
   cooldown:
     default-tick: 100
@@ -114,7 +114,8 @@ sounds:
     name: "minecraft:entity.villager.no"
     volume: 1
     pitch: 1
+  # Played when a player is teleported after falling into the void
   void:
-    name: "minecraft:entity.villager.no"
+    name: "minecraft:ambient.cave"
     volume: 1
-    pitch: 1
+    pitch: 1.8

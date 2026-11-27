@@ -81,7 +81,7 @@ spawn:
   # Placeholders: <remaining-second>
   cooldown: "<prefix><green>You are on cooldown for <white><remaining-second><green>s."
 
-# /setspawn
+# /wspawn reload
 # Here <spawn-*> is the NEW location, and <old-*> is the previous one.
 set-spawn:
   # Sent after the spawn is changed
