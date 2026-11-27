@@ -3,6 +3,7 @@ package ch.wondercraft.wonderspawn.events;
 import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
+import ch.wondercraft.wonderspawn.teleportation.TeleportationSound;
 import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
@@ -55,7 +56,7 @@ public class VoidEvent implements Listener, Reloadable {
                 boolean keepInventory = SimpleBooleanDefaultPerm.getter(player,"wspawn.voidfall.keep-inventory",isDefaultKeepInventory);
                 if (!keepInventory)
                     player.getInventory().clear();
-                teleportationService.request(player).thenAccept(teleportationOutCome -> {
+                teleportationService.request(player, TeleportationSound.teleportationSoundType.VOID).thenAccept(teleportationOutCome -> {
                     if (teleportationOutCome== TeleportationOutCome.SUCCESS){
                         componentCreator.send(player,(keepInventory)? componentCreator.onVoidFallKeep(player):componentCreator.onVoidFallClear(player));
                     }

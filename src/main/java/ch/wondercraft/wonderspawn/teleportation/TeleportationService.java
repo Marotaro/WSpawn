@@ -59,20 +59,34 @@ public class TeleportationService implements Reloadable {
         read();
     }
 
-    public CompletableFuture<TeleportationOutCome> request(Player player){
-        CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
+    private void teleportation(Player player, CompletableFuture<TeleportationOutCome> future, TeleportationSound.teleportationSoundType type){
         Rotation playerRotation = player.getLocation().getRotation();
-        player.teleportAsync(spawnLocation).thenAccept(b -> {
-            if (b) {
+        player.teleportAsync(spawnLocation).thenAccept(b->{
+            if (b){
                 if (!getPlayerFaceSetOrientation(player)) player.setRotation(playerRotation.yaw(),playerRotation.pitch());
                 if (!getPlayerKeepFallDistance(player)) player.setFallDistance(0L);
-                teleportationSound.play(player, TeleportationSound.teleportationSoundType.FINAL);
+                teleportationSound.play(player, type);
                 future.complete(TeleportationOutCome.SUCCESS);
             } else {
-                teleportationSound.play(player, TeleportationSound.teleportationSoundType.ERROR);
+                teleportationSound.play(player, type);
                 future.complete(TeleportationOutCome.ERROR);
             }
         });
+    }
+
+    private void teleportation(Player player, CompletableFuture<TeleportationOutCome> future){
+        teleportation(player,future,TeleportationSound.teleportationSoundType.FINAL);
+    }
+
+    public CompletableFuture<TeleportationOutCome> request(Player player){
+        CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
+        teleportation(player,future);
+        return future;
+    }
+
+    public CompletableFuture<TeleportationOutCome> request(Player player, TeleportationSound.teleportationSoundType soundType){
+        CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
+        teleportation(player,future, soundType);
         return future;
     }
 
@@ -83,18 +97,7 @@ public class TeleportationService implements Reloadable {
         CompletableFuture<TeleportationOutCome> future = new CompletableFuture<>();
         teleportationQueue.add(player,waitTicks,canMove).thenAccept(waitOutCome -> {
             if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.SUCCESS){
-                Rotation playerRotation = player.getLocation().getRotation();
-                player.teleportAsync(spawnLocation).thenAccept(success -> {
-                    if (success){
-                        if (!getPlayerFaceSetOrientation(player)) player.setRotation(playerRotation.yaw(),playerRotation.pitch());
-                        if (!getPlayerKeepFallDistance(player)) player.setFallDistance(0L);
-                        teleportationSound.play(player, TeleportationSound.teleportationSoundType.FINAL);
-                        future.complete(TeleportationOutCome.SUCCESS);
-                    } else {
-                        teleportationSound.play(player, TeleportationSound.teleportationSoundType.ERROR);
-                        future.complete(TeleportationOutCome.ERROR);
-                    }
-                });
+                teleportation(player,future);
             } else if (waitOutCome == TeleportationQueue.WaitInfo.WaitOutCome.MOVED) {
                 teleportationSound.play(player, TeleportationSound.teleportationSoundType.ERROR);
                 future.complete(TeleportationOutCome.MOVED);
