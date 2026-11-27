@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
+import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -10,41 +11,35 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TeleportationCooldown {
+public class TeleportationCooldown implements Reloadable {
     private final Plugin plugin;
     private int defaultCooldown;
     private boolean useMax;
     private final Map<UUID, Integer> playerCooldown = new ConcurrentHashMap<>();
 
-    private TeleportationCooldown(Plugin plugin, Data data){
+    public TeleportationCooldown(Plugin plugin){
         this.plugin = plugin;
-        plugin.getLogger().info("Loading TeleportationCooldown");
-        apply(data);
+        load(plugin);
         Bukkit.getScheduler().runTaskTimer(plugin,this::tickAll,0L,1L);
     }
 
-    public static TeleportationCooldown load(Plugin plugin){
-        return new TeleportationCooldown(plugin,read(plugin));
-    }
-
-    private static Data read(Plugin plugin){
+    private void read(){
         ConfigChecker.warnIfMissing(plugin,"teleportation.cooldown.default-tick");
-        int defaultCooldown = plugin.getConfig().getInt("teleportation.cooldown.default-tick");
+        defaultCooldown = plugin.getConfig().getInt("teleportation.cooldown.default-tick");
         ConfigChecker.warnIfMissing(plugin,"teleportation.cooldown.use-max");
-        boolean useMax = plugin.getConfig().getBoolean("teleportation.cooldown.use-max");
-        return new Data(defaultCooldown,useMax);
+        useMax = plugin.getConfig().getBoolean("teleportation.cooldown.use-max");
     }
 
-    private void apply(Data data){
-        this.defaultCooldown = data.defaultCooldown();
-        this.useMax = data.useMax();
+    @Override
+    public void load(Plugin plugin){
+        Reloadable.super.load(plugin);
+        read();
     }
 
-    private record Data(int defaultCooldown, boolean useMax){};
-
-    public void reload(){
-        plugin.getLogger().info("reloading TeleportationCooldown");
-        apply(read(plugin));
+    @Override
+    public void reload(Plugin plugin) {
+        Reloadable.super.reload(plugin);
+        read();
     }
 
     private void tickAll(){

@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
+import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import net.kyori.adventure.key.InvalidKeyException;
 import net.kyori.adventure.key.Key;
@@ -8,51 +9,62 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
-public class TeleportationSound {
-    public enum Type {INITIAL, INTERVAL, FINAL, ERROR,CANCELED;}
+public class TeleportationSound implements Reloadable {
+    private static final String SOUND_NAME_SUB_PATH = ".name";
+    private static final String SOUND_VOLUME_SUB_PATH = ".volume";
+    private static final String SOUND_PITCH_SUB_PATH = ".pitch";
+    public enum teleportationSoundType {INITIAL, INTERVAL, FINAL, ERROR, CANCELED, VOID};
     private final Plugin plugin;
-    private Map<Type, Sound> sounds;
+    private final Map<teleportationSoundType, Sound> soundMap = new HashMap<>();
 
-    private TeleportationSound(Plugin plugin, Map<Type,Sound> sounds){
+    public TeleportationSound(Plugin plugin){
         this.plugin = plugin;
-        this.sounds = sounds;
+        load(this.plugin);
     }
 
-    private static Map<Type, Sound> read(Plugin plugin){
-        Map<Type,Sound> result = new EnumMap<>(Type.class);
-        for (Type type : Type.values()){
+    private void read(){
+        for (teleportationSoundType type : teleportationSoundType.values()){
             String path = "sounds."+type.toString().toLowerCase();
-            ConfigChecker.warnIfMissing(plugin, path+".name");
-            String name = plugin.getConfig().getString(path+".name");
-
+            boolean missing = ConfigChecker.warnIfMissing(this.plugin,path);
+            String namePath = path+SOUND_NAME_SUB_PATH;
+            String volumePath = path+SOUND_VOLUME_SUB_PATH;
+            String pitchPath = path+SOUND_PITCH_SUB_PATH;
+            if (!missing){
+                ConfigChecker.warnIfMissing(plugin,namePath);
+                ConfigChecker.warnIfMissing(plugin,volumePath);
+                ConfigChecker.warnIfMissing(plugin,pitchPath);
+            }
             Key key;
             try {
-                key = Key.key(name);
-            } catch (InvalidKeyException e) {
-                continue;
+                String soundName = plugin.getConfig().getString(namePath);
+                if (soundName==null) soundName="";
+                key = Key.key(soundName);
+            } catch (InvalidKeyException e){
+                plugin.getLogger().warning("Sounds: invalid name for "+type.toString().toLowerCase()+" sound");
+                key = Key.key("");
             }
-            ConfigChecker.warnIfMissing(plugin,path+".volume");
-            float volume = (float) plugin.getConfig().getDouble(path+".volume");
-            ConfigChecker.warnIfMissing(plugin,path+".pitch");
-            float pitch = (float) plugin.getConfig().getDouble(path+".pitch");
-            result.put(type,Sound.sound(key, Sound.Source.MASTER,volume,pitch));
+            float volume = (float) plugin.getConfig().getDouble(volumePath);
+            float pitch = (float) plugin.getConfig().getDouble(pitchPath);
+            soundMap.put(type,Sound.sound(key, Sound.Source.MASTER,volume,pitch));
         }
-        return result;
     }
 
-    public static TeleportationSound load(Plugin plugin){
-        plugin.getLogger().info("loading Sounds");
-        return new TeleportationSound(plugin,read(plugin));
+    @Override
+    public void load(Plugin plugin) {
+        Reloadable.super.load(plugin);
+        read();
     }
 
-    public void reload(){
-        plugin.getLogger().info("reloading Sounds");
-        this.sounds = read(plugin);
+    @Override
+    public void reload(Plugin plugin) {
+        Reloadable.super.reload(plugin);
+        read();
     }
 
-    public void play(Player player, Type type){
-        player.playSound(sounds.get(type));
+    public void play(Player player, teleportationSoundType type){
+        player.playSound(soundMap.get(type));
     }
 }

@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.teleportation;
 
+import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import net.kyori.adventure.bossbar.BossBar;
@@ -13,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class TeleportationQueue{
+public class TeleportationQueue implements Reloadable {
     private final Plugin plugin;
     private final ComponentCreator componentCreator;
     private final TeleportationSound teleportationSound;
@@ -25,12 +26,24 @@ public class TeleportationQueue{
     private BossBar.Color bossBarTimerColor;
     private Set<BossBar.Flag> bossBarTimerFlags;
 
-    private TeleportationQueue(Plugin plugin, ComponentCreator componentCreator,TeleportationSound teleportationSound,Data data){
+    public TeleportationQueue(Plugin plugin, ComponentCreator componentCreator,TeleportationSound teleportationSound){
         this.plugin = plugin;
         this.componentCreator = componentCreator;
         this.teleportationSound = teleportationSound;
-        apply(data);
+        load(plugin);
         Bukkit.getScheduler().runTaskTimer(plugin,this::tickAll,0L,1L);
+    }
+
+    @Override
+    public void load(Plugin plugin) {
+        Reloadable.super.load(plugin);
+        read();
+    }
+
+    @Override
+    public void reload(Plugin plugin) {
+        Reloadable.super.reload(plugin);
+        read();
     }
 
     private void tickAll(){
@@ -48,12 +61,12 @@ public class TeleportationQueue{
     public CompletableFuture<WaitInfo.WaitOutCome> add(Player player, int waitTicks, boolean canMove){
         CompletableFuture<WaitInfo.WaitOutCome> waitOutCome = new CompletableFuture<>();
         if (uuidWaitInfoMap.containsKey(player.getUniqueId())){
-            teleportationSound.play(player, TeleportationSound.Type.CANCELED);
+            teleportationSound.play(player, TeleportationSound.teleportationSoundType.CANCELED);
             componentCreator.send(player,componentCreator.spawnCanceledPromise(player,waitTicks/20));
             uuidWaitInfoMap.get(player.getUniqueId()).update(waitTicks,canMove,waitOutCome);
             uuidBossBarMap.get(player.getUniqueId()).tick(waitTicks,waitTicks,canMove);
         } else {
-            teleportationSound.play(player, TeleportationSound.Type.INITIAL);
+            teleportationSound.play(player, TeleportationSound.teleportationSoundType.INITIAL);
             componentCreator.send(player,componentCreator.spawnPromise(player,waitTicks/20));
             uuidWaitInfoMap.put(player.getUniqueId(), new WaitInfo(player,waitTicks,canMove,waitOutCome));
             uuidBossBarMap.put(player.getUniqueId(),new BarTimer(player,waitTicks, canMove));
@@ -62,41 +75,19 @@ public class TeleportationQueue{
         return waitOutCome;
     }
 
-    private void apply(Data data){
-        this.textTimerActive = data.textTimerActive;
-        this.bossBarTimerActive = data.bossBarTimerActive;
-        this.bossBarTimerPerSecondUpdate = data.bossBarTimerPerSecondUpdate;
-        this.bossBarTimerColor = data.bossBarTimerColor;
-        this.bossBarTimerFlags = data.bossBarTimerFlags;
-    }
-
-    private static Data read(Plugin plugin){
+    private void read(){
         ConfigChecker.warnIfMissing(plugin,"timer.chat.active");
-        boolean textTimerActive = plugin.getConfig().getBoolean("timer.chat.active");
+        textTimerActive = plugin.getConfig().getBoolean("timer.chat.active");
         ConfigChecker.warnIfMissing(plugin,"timer.bossbar.active");
-        boolean bossBarTimerActive = plugin.getConfig().getBoolean("timer.bossbar.active");
+        bossBarTimerActive = plugin.getConfig().getBoolean("timer.bossbar.active");
         ConfigChecker.warnIfMissing(plugin,"timer.bossbar.per-second-update");
-        boolean bossBarTimerPerSecondUpdate = plugin.getConfig().getBoolean("timer.bossbar.per-second-update");
+        bossBarTimerPerSecondUpdate = plugin.getConfig().getBoolean("timer.bossbar.per-second-update");
         ConfigChecker.warnIfMissing(plugin,"timer.bossbar.color");
-        BossBar.Color bossBarTimerColor = BossBar.Color.valueOf(plugin.getConfig().getString("timer.bossbar.color"));
+        bossBarTimerColor = BossBar.Color.valueOf(plugin.getConfig().getString("timer.bossbar.color"));
         ConfigChecker.warnIfMissing(plugin,"timer.bossbar.flags");
-        Set<BossBar.Flag> bossBarTimerFlags = plugin.getConfig().getStringList("timer.bossbar.flags").stream().map(BossBar.Flag::valueOf).collect(Collectors.toSet());
-        return new Data(textTimerActive,bossBarTimerActive,bossBarTimerPerSecondUpdate,bossBarTimerColor,bossBarTimerFlags);
+        bossBarTimerFlags = plugin.getConfig().getStringList("timer.bossbar.flags").stream().map(BossBar.Flag::valueOf).collect(Collectors.toSet());
     }
 
-    public static TeleportationQueue load(Plugin plugin, ComponentCreator componentCreator, TeleportationSound teleportationSound){
-        plugin.getLogger().info("loading TeleportationQueue");
-        return new TeleportationQueue(plugin,componentCreator,teleportationSound,read(plugin));
-    }
-
-    public void reload(){
-        plugin.getLogger().info("reloading TeleportationQueue");
-        apply(read(plugin));
-    }
-
-    private record Data(boolean textTimerActive, boolean bossBarTimerActive,
-                        boolean bossBarTimerPerSecondUpdate, BossBar.Color bossBarTimerColor,
-                        Set<BossBar.Flag> bossBarTimerFlags){}
     public final class WaitInfo{
         public enum WaitOutCome {SUCCESS, MOVED, CANCELED}
         public enum State {RUNNING, DONE}
@@ -125,7 +116,7 @@ public class TeleportationQueue{
             if (elapsedTicks!=0 && remainingTick()%20==0 && remainingTick()!=0){
                 if (textTimerActive)
                     componentCreator.send(player,componentCreator.chat(player,remainingTick()/20,canMove));
-                teleportationSound.play(player, TeleportationSound.Type.INTERVAL);
+                teleportationSound.play(player, TeleportationSound.teleportationSoundType.INTERVAL);
             }
             if (remainingTick()==0){
                 waitOutCome.complete(WaitOutCome.SUCCESS);

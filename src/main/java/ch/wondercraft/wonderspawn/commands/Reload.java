@@ -1,8 +1,9 @@
 package ch.wondercraft.wonderspawn.commands;
 
-import ch.wondercraft.wonderspawn.ConfigManager;
+import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.events.JoinEvent;
 import ch.wondercraft.wonderspawn.events.RespawnEvent;
+import ch.wondercraft.wonderspawn.events.VoidEvent;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationCooldown;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationQueue;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
@@ -16,27 +17,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 public class Reload {
-    public static LiteralArgumentBuilder<CommandSourceStack> create(Plugin plugin,
-                                                                    TeleportationSound teleportationSound,
-                                                                    TeleportationService teleportationService,
-                                                                    TeleportationQueue  teleportationQueue,
-                                                                    TeleportationCooldown teleportationCooldown,
-                                                                    ComponentCreator componentCreator,
-                                                                    JoinEvent joinEvent,
-                                                                    RespawnEvent respawnEvent){
+    public static LiteralArgumentBuilder<CommandSourceStack> create(Plugin plugin,ComponentCreator componentCreator,
+                                                                    Reloadable... reloadables){
         return Commands.literal("reload").requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("wspawn.reload"))
                 .executes(context -> {
                     CommandSender commandSender = context.getSource().getSender();
                     commandSender.sendMessage(componentCreator.reloadPromise(commandSender));
                     try {
                         plugin.reloadConfig();
-                        teleportationSound.reload();
-                        teleportationService.reload();
-                        teleportationCooldown.reload();
-                        teleportationQueue.reload();
-                        componentCreator.reload();
-                        joinEvent.reload();
-                        respawnEvent.reload();
+                        for (Reloadable reloadable:reloadables){
+                            reloadable.reload(plugin);
+                        }
                         commandSender.sendMessage(componentCreator.reloadConfirmation(commandSender));
                     } catch (Exception e) {
                         commandSender.sendMessage(componentCreator.reloadFailed(commandSender, e));

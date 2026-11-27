@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.events;
 
+import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationOutCome;
 import ch.wondercraft.wonderspawn.teleportation.TeleportationService;
 import ch.wondercraft.wonderspawn.text.ComponentCreator;
@@ -10,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 
-public class JoinEvent implements Listener {
+public class JoinEvent implements Listener, Reloadable {
     private final Plugin plugin;
     private final TeleportationService teleportationService;
     private final ComponentCreator componentCreator;
@@ -19,12 +20,11 @@ public class JoinEvent implements Listener {
 
     public JoinEvent(Plugin plugin, TeleportationService teleportationService, ComponentCreator componentCreator){
         this.plugin = plugin;
-        plugin.getLogger().info("loading JoinEvent");
         this.teleportationService = teleportationService;
         this.componentCreator = componentCreator;
-        read(plugin);
+        load(plugin);
     }
-    private void read(Plugin plugin){
+    private void read(){
         String onFirstJoin = "events.on-first-join";
         ConfigChecker.warnIfMissing(plugin,onFirstJoin);
         this.teleportOnFirstJoin = plugin.getConfig().getBoolean(onFirstJoin);
@@ -33,9 +33,16 @@ public class JoinEvent implements Listener {
         this.teleportOnJoin = plugin.getConfig().getBoolean(onJoin);
     }
 
-    public void reload(){
-        plugin.getLogger().info("reloading JoinEvent");
-        read(plugin);
+    @Override
+    public void load(Plugin plugin) {
+        Reloadable.super.load(plugin);
+        read();
+    }
+
+    @Override
+    public void reload(Plugin plugin){
+        Reloadable.super.reload(plugin);
+        read();
     }
 
     @EventHandler

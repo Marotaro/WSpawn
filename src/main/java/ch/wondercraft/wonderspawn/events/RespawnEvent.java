@@ -1,5 +1,6 @@
 package ch.wondercraft.wonderspawn.events;
 
+import ch.wondercraft.wonderspawn.Reloadable;
 import ch.wondercraft.wonderspawn.text.ComponentCreator;
 import ch.wondercraft.wonderspawn.utils.ConfigChecker;
 import ch.wondercraft.wonderspawn.utils.SimpleBooleanDefaultPerm;
@@ -10,23 +11,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.Plugin;
 
-public class RespawnEvent implements Listener {
+public class RespawnEvent implements Listener, Reloadable {
     private final Plugin plugin;
     private final Location spawnLocation;
     private final ComponentCreator componentCreator;
     private boolean defaultIfMissing = true;
-    private boolean defaultOverRideBedRespawn = true;
-    private boolean defaultOverRideAnchorRespawn;
+    private boolean defaultOverRideBedRespawn = false;
+    private boolean defaultOverRideAnchorRespawn = false;
 
     public RespawnEvent(Plugin plugin, Location spawnLocation, ComponentCreator componentCreator){
         this.plugin = plugin;
         this.spawnLocation = spawnLocation;
         this.componentCreator = componentCreator;
-        plugin.getLogger().info("loading RespawnEvent");
-        read(plugin);
+        load(plugin);
     }
 
-    private void read(Plugin plugin){
+    private void read(){
         ConfigChecker.warnIfMissing(plugin,"events.respawn.if-missing");
         this.defaultIfMissing = plugin.getConfig().getBoolean("events.respawn.if-missing");
         ConfigChecker.warnIfMissing(plugin,"events.respawn.override-bed");
@@ -35,9 +35,16 @@ public class RespawnEvent implements Listener {
         this.defaultOverRideAnchorRespawn = plugin.getConfig().getBoolean("events.respawn.override-anchor");
     }
 
-    public void reload(){
-        plugin.getLogger().info("reloading RespawnEvent");
-        read(plugin);
+    @Override
+    public void load(Plugin plugin) {
+        Reloadable.super.load(plugin);
+        read();
+    }
+
+    @Override
+    public void reload(Plugin plugin){
+        Reloadable.super.reload(plugin);
+        read();
     }
 
     @EventHandler
